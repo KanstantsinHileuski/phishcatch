@@ -67,15 +67,15 @@ export async function handlePasswordEntry(message: PasswordContent) {
   const url = message.url
   const host = getHostFromUrl(url)
   const password = message.password
-  const ProtectedRoute = ProtectedRoutes[host as keyof typeof ProtectedRoutes]
+  const protectedRoute = ProtectedRoutes[host as keyof typeof ProtectedRoutes]
 
-  if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === ProtectedRoute) {
+  if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === protectedRoute) {
     if (message.save) {
       await hashAndSavePassword(password, message.username, host)
       return PasswordHandlingReturnValue.EnterpriseSave
     }
     return PasswordHandlingReturnValue.EnterpriseNoSave
-  } else if ((await getDomainType(host)) === DomainType.DANGEROUS || host !==  ProtectedRoute) {
+  } else if ((await getDomainType(host)) === DomainType.DANGEROUS || host !==  protectedRoute) {
     const hashData = await getHashDataIfItExists(password)
     if (hashData) {
       await handlePasswordLeak(message, hashData)
