@@ -100,7 +100,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
   void createServerAlert(alertContent)
 
   if (config.display_reuse_alerts) {
-    const alertIconUrl = chrome.runtime.getURL('hacker.png')
+    const alertIconUrl = chrome.runtime.getURL('icon.png')
     const opt: chrome.notifications.NotificationOptions = {
       type: 'basic',
       title: 'PhishCatch Alert',
