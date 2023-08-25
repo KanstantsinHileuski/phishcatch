@@ -12,7 +12,7 @@ uvicorn==0.13.4
 ```
 
 ## Package an extension
-```shell
+```
 Bring up the Extensions management page by going to this URL: chrome://extensions
 If Developer mode has a + by it, click the +.
 Click the Pack extension button. A dialog appears.
@@ -28,7 +28,7 @@ npm run watch
 ```
 
 To start the application: -for backend
-```shell
+```
 click run and debug button from vscode toolbar
 launch.json file is created with corresponding cwd setup
 run with "Python: FastAPI"
