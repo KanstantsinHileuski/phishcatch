@@ -20,14 +20,14 @@ In the Extension root directory field, specify the path to the extension's folde
 ```
 
 ## Run
-To start the application: -for frontend
+To start the application for frontend
 ```shell
 cd extension
 npm run watch
 
 ```
 
-To start the application: -for backend
+To start the application for backend
 ```
 click run and debug button from vscode toolbar
 launch.json file is created with corresponding cwd setup
