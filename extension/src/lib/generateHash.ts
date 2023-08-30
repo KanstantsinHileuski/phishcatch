@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as pbkdf2 from 'pbkdf2'
+import * as argon2 from 'argon2-browser';
 import { getConfig } from '../config'
 import { byteToHex } from './byteToHex'
 
@@ -24,31 +24,25 @@ export interface ContextlessPasswordHash {
 export async function hashPasswordWithSalt(key: string, salt: string): Promise<ContextlessPasswordHash> {
   const config = await getConfig()
 
-  const iterations = config.pbkdf2_iterations
-  const keylen = 64
-  const hashType = 'sha512'
+  const iterations = config.argon2_iterations
+  const hashType = argon2.ArgonType.Argon2id
+
+  let { hash } = await argon2.hash({ pass: key, salt: salt, time: iterations, type: hashType });
 
   return new Promise((resolve, reject) => {
     if (!salt || salt.length < 32) {
       reject(`No/bad salt! This is unsafe.`)
     }
 
-    pbkdf2.pbkdf2(key, salt, iterations, keylen, hashType, (err, derivedKey) => {
-      if (err) {
-        reject(err)
-      } else {
-        let hash = derivedKey.toString('hex')
-        if (config.hash_truncation_amount > 0) {
-          hash = hash.slice(0, -config.hash_truncation_amount)
-        }
+    if(!hash) {
+      reject(`There is no hash generated`);
+    }
 
-        const passwordHash = {
-          hash,
-          salt,
-        }
-        resolve(passwordHash)
-      }
-    })
+    const passwordHash = {
+      hash: byteToHex(hash),
+      salt
+    }
+    resolve(passwordHash)
   })
 }
 

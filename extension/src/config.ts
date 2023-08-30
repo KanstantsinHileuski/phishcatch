@@ -32,7 +32,7 @@ const defaults: Prefs = {
   hash_truncation_amount: 0,
   ignored_domains: [],
   manual_password_entry: false,
-  pbkdf2_iterations: 100000,
+  argon2_iterations: 2,
   phishcatch_server: '',
   psk: '',
   repo_link: null,

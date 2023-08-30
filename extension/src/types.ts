@@ -22,7 +22,7 @@ export interface Prefs {
   hash_truncation_amount: number
   ignored_domains: string[]
   manual_password_entry: boolean
-  pbkdf2_iterations: number
+  argon2_iterations: number
   phishcatch_server: string
   psk: string
   repo_link: string | null

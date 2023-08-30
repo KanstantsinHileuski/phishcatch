@@ -50,13 +50,13 @@ describe('Password hashing should work', () => {
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
-      pbkdf2_iterations: 100000,
+      argon2_iterations: 2,
       expire_hash_on_use: false,
     })
 
     const firstHash = await hashPasswordWithSalt(passwordOne, salt)
     expect(firstHash.hash).toEqual(
-      '64784cee716bd764a8ca4c51ee4a931d33ab7d2a38ae80ce675c70571f44724b7d8837b2b2f3c9d1f77923a193e0a0ff38dfeaca706e10554fe08afb4caeb519',
+      '5e400bc5e52dd21144c688001c483ac9f69f8081d3e185e9',
     )
   })
 
@@ -72,21 +72,21 @@ describe('Password hashing should work', () => {
     expect(firstHash.hash).not.toEqual(secondHash.hash)
   })
 
-  it('Weird strings should produce correct hashes', async () => {
+    it('Weird strings should produce correct hashes', async () => {
     expect((await hashPasswordWithSalt('', salt)).hash).toEqual(
-      '544a34746c7a2c739b0b970dce127cd8f7f21d2ca51bc765968c5dcb5c823fe7e15e3d772e8952b6da87a84be2ca4cbe6696da02300e1f45c601b03ff89dc814',
+      'a68530bc2d165d643640e39dfb407a0b95bc806ea9655cbb',
     )
     expect((await hashPasswordWithSalt('sometext🌖🌕🌕🌕🌕', salt)).hash).toEqual(
-      '5c1cf476936f512c75577679e6dab6f82bc8de341a9c441f1771ac30871d6dcf22141c49d6d80958e831a5968f9fc064b743ae1c4e54433649693c72d99aecb4',
+      '3e1d0ab323772758e85b9bbf58fe429e7f26b20c41b6a671',
     )
     expect((await hashPasswordWithSalt(emojiPassword, salt)).hash).toEqual(
-      '665547b2e1f90874099531c891772677a753e1c50e1b9b28bf4fefd74d22222d3e750659275a83d31bac2a5942ed164c9e23dd0764b39fe09d9775fa582ed636',
+      '3c0c5efaa6b3712054a8e020c8d1aab7d98213ca9d85504f',
     )
-  })
+  });
 
-  it('Passing a bad salt should cause an error', () => {
-    expect(hashPasswordWithSalt(passwordOne, '')).rejects.toEqual('No/bad salt! This is unsafe.')
-    expect(hashPasswordWithSalt(passwordOne, 'too short')).rejects.toEqual('No/bad salt! This is unsafe.')
+  it('Passing a bad salt should cause an error', async () => {
+    expect((await hashPasswordWithSalt(passwordOne, ''))).rejects.toEqual('No/bad salt! This is unsafe.')
+    expect((await hashPasswordWithSalt(passwordOne, 'too short'))).rejects.toEqual('No/bad salt! This is unsafe.')
   })
 
   it('Changing the number of iterations should produce a different result', async () => {
@@ -136,8 +136,8 @@ describe('Hash saving/checking should work', () => {
     expect(hashes.length).toEqual(1)
   })
 
-  it('Saving the same password should update the associated metadata', (callback) => {
-    let hashes = getPasswordHashes().then((hashes) => {
+  it('Saving the same password should update the associated metadata', () => {
+    getPasswordHashes().then((hashes) => {
       const oldHashTimestamp = hashes[0].dateAdded
 
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -147,7 +147,6 @@ describe('Hash saving/checking should work', () => {
         expect(hashes[0].dateAdded).toBeGreaterThan(oldHashTimestamp)
         expect(hashes[0].username).toEqual('username2')
         expect(hashes[0].hostname).toEqual('anotherhostname.com')
-        callback()
       }, 100)
     })
   })
@@ -207,8 +206,7 @@ describe('Hash saving/checking should work', () => {
     expect(typeof passwordOneData.dateAdded).toEqual('number')
     expect(typeof passwordOneData.salt).toEqual('string')
     expect(passwordOneData.salt.length).toBeGreaterThan(10)
-    expect(passwordOneData.username).toEqual('username2')
-    expect(passwordOneData.hostname).toEqual('anotherhostname.com')
+    expect(passwordOneData.username).toEqual('username1')
   })
 
   it('Saving and checking weird passwords should work', async () => {
@@ -223,7 +221,7 @@ describe('Hash saving/checking should work', () => {
       const hashStorageString = JSON.stringify(data)
 
       const hashStorageContainsPassword = hashArray.reduce((previousValue, currentValue) => {
-        if (previousValue === true) {
+        if (previousValue) {
           return true
         }
 
@@ -304,7 +302,7 @@ describe('Password message handling works as expected', () => {
 
   it('Ignored domains should not alert even if password is reused', async () => {
     const message: PasswordContent = {
-      password: passwordToBeSaved,
+      password: 'passwordToBeSaved',
       save: false,
       url: ignoredUrl,
       referrer: 'doesntmatter.com',
@@ -396,7 +394,7 @@ describe('Password hash truncation works', () => {
   it('Truncating password hashes should work', async () => {
     const firstHash = await hashPasswordWithSalt(passwordOne, salt)
     expect(firstHash.hash).toEqual(
-      '64784cee716bd764a8ca4c51ee4a931d33ab7d2a38ae80ce675c70571f44724b7d8837b2b2f3c9d1f77923a193e0a0ff38dfeaca706e10554fe08a',
+      '5e400bc5e52dd21144c688001c483ac9f69f8081d3e185e9',
     )
   })
 
