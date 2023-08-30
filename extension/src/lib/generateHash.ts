@@ -29,21 +29,25 @@ export async function hashPasswordWithSalt(key: string, salt: string): Promise<C
 
   let { hash } = await argon2.hash({ pass: key, salt: salt, time: iterations, type: hashType });
 
-  return new Promise((resolve, reject) => {
+  try {
     if (!salt || salt.length < 32) {
-      reject(`No/bad salt! This is unsafe.`)
+      throw new Error( "Salt is too short")
     }
 
-    if(!hash) {
-      reject(`There is no hash generated`);
+    if (!hash) {
+      throw new Error(`There is no hash generated`);
     }
 
     const passwordHash = {
       hash: byteToHex(hash),
       salt
-    }
-    resolve(passwordHash)
-  })
+    };
+
+    return Promise.resolve(passwordHash);
+  } catch (error) {
+    const { message } = error
+    return Promise.reject(message);
+  }
 }
 
 export async function generateSaltAndHashPassword(key: string): Promise<ContextlessPasswordHash> {

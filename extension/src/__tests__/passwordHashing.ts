@@ -41,7 +41,24 @@ const ignoredUrl = 'http://ignored.com/bar'
 const protectedUrl = 'http://protected.com'
 const evilUrl = 'http://evil.com/foo'
 
+const errMessage = {
+  "code": -6,
+  "message": "Salt is too short"
+}
 describe('Password hashing should work', () => {
+  beforeAll(async () => {
+    await setConfigOverride({
+      enterprise_domains: [enterpriseDomain],
+      phishcatch_server: '',
+      psk: '',
+      data_expiry: 90,
+      display_reuse_alerts: false,
+      ignored_domains: [ignoredDomain],
+      pbkdf2_iterations: 100000,
+      hash_truncation_amount: 10,
+    })
+  })
+
   it('A password should always hash to the same value (given the salt is the same)', async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
@@ -84,10 +101,9 @@ describe('Password hashing should work', () => {
     )
   });
 
-  // it('Passing a bad salt should cause an error', async () => {
-  //   expect((await hashPasswordWithSalt(passwordOne, ''))).rejects.toEqual('No/bad salt! This is unsafe.')
-  //   expect((await hashPasswordWithSalt(passwordOne, 'too short'))).rejects.toEqual('No/bad salt! This is unsafe.')
-  // })
+  it('Passing a bad salt should cause an error', async () => {
+    await expect(hashPasswordWithSalt(passwordOne, '')).rejects.toEqual(errMessage)
+  })
 
   it('Changing the number of iterations should produce a different result', async () => {
     await setConfigOverride({
