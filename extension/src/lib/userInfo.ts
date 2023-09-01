@@ -167,14 +167,16 @@ export async function hashAndSavePassword(password: string, username?: string, h
 
   if (hashDetails.hashExists) {
     let newUsername = username
-    if (!username || username.length < 1) {
+    let newHostname = hostname
+    if ((!username || username.length < 1) && (!hostname || hostname.length < 1)) {
       newUsername = currentHashes[hashDetails.hashIndex].username
+      newHostname = currentHashes[hashDetails.hashIndex].hostname
     }
 
     currentHashes[hashDetails.hashIndex] = {
       ...currentHashes[hashDetails.hashIndex],
       username: newUsername,
-      hostname,
+      hostname: newHostname,
       dateAdded: new Date().getTime(),
     }
   } else {

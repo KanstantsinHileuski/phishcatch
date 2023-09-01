@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as pbkdf2 from 'pbkdf2'
+import * as argon2 from 'argon2-browser';
 import { getConfig } from '../config'
 import { byteToHex } from './byteToHex'
 
@@ -24,32 +24,30 @@ export interface ContextlessPasswordHash {
 export async function hashPasswordWithSalt(key: string, salt: string): Promise<ContextlessPasswordHash> {
   const config = await getConfig()
 
-  const iterations = config.pbkdf2_iterations
-  const keylen = 64
-  const hashType = 'sha512'
+  const iterations = config.argon2_iterations
+  const hashType = argon2.ArgonType.Argon2id
 
-  return new Promise((resolve, reject) => {
+  let { hash } = await argon2.hash({ pass: key, salt: salt, time: iterations, type: hashType });
+
+  try {
     if (!salt || salt.length < 32) {
-      reject(`No/bad salt! This is unsafe.`)
+      throw new Error( "Salt is too short")
     }
 
-    pbkdf2.pbkdf2(key, salt, iterations, keylen, hashType, (err, derivedKey) => {
-      if (err) {
-        reject(err)
-      } else {
-        let hash = derivedKey.toString('hex')
-        if (config.hash_truncation_amount > 0) {
-          hash = hash.slice(0, -config.hash_truncation_amount)
-        }
+    if (!hash) {
+      throw new Error(`There is no hash generated`);
+    }
 
-        const passwordHash = {
-          hash,
-          salt,
-        }
-        resolve(passwordHash)
-      }
-    })
-  })
+    const passwordHash = {
+      hash: byteToHex(hash),
+      salt
+    };
+
+    return Promise.resolve(passwordHash);
+  } catch (error) {
+    const { message } = error
+    return Promise.reject(message);
+  }
 }
 
 export async function generateSaltAndHashPassword(key: string): Promise<ContextlessPasswordHash> {

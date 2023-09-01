@@ -14,6 +14,8 @@
   "dependencies": {
     "@blueprintjs/core": "^3.32.1",
     "@blueprintjs/icons": "^3.21.0",
+    "argon2-browser": "^1.18.0",
+    "base64-loader": "^1.0.0",
     "jest-environment-jsdom": "^29.1.2",
     "mobx": "^5.15.7",
     "mobx-react": "^6.3.0",
@@ -24,6 +26,7 @@
     "util": "^0.12.4"
   },
   "devDependencies": {
+    "@types/argon2-browser": "^1.18.1",
     "@types/chrome": "0.0.122",
     "@types/jest": "29.1.2",
     "@types/jquery": "^3.3.33",
