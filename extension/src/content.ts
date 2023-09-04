@@ -15,7 +15,7 @@
 import { debounce } from './content-lib/debounce'
 import { getSanitizedUrl } from './lib/getSanitizedUrl'
 import { getDomainType } from './lib/getDomainType'
-import { DomainType, PasswordContent, UsernameContent } from './types'
+import { DomainType, PasswordContent, ProtectedRoutes, UsernameContent } from './types'
 import { getConfig } from './config'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 
@@ -149,13 +149,15 @@ async function checkIfUrlBanned() {
 }
 
 ready(() => {
+  const host:string = '';
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setTimeout(async () => {
-    if ((await getDomainType(window.location.hostname)) === DomainType.ENTERPRISE) {
+    if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
       document.addEventListener('focusout', enterpriseFocusOutTrigger)
       document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
+      chrome.storage.local.set({clientUserAgent: navigator.userAgent})
       void checkDomHash()
-    } else if ((await getDomainType(window.location.hostname)) === DomainType.DANGEROUS) {
+    } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
       document.addEventListener('input', inputChangedTrigger, false)
       void checkDomHash()
     }

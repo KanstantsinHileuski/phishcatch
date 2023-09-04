@@ -26,6 +26,15 @@ export async function getUsernames(): Promise<Username[]> {
   })
 }
 
+async function getUserInfo () {
+  return new Promise((resolve) => {
+    chrome.storage.local.get('clientUserAgent', (data) => {
+      const info: any = data.clientUserAgent || []
+      resolve(info)
+    })
+  })
+}
+
 export async function saveUsername(username: string): Promise<boolean> {
   const config = await getConfig()
 
@@ -48,6 +57,10 @@ export async function saveUsername(username: string): Promise<boolean> {
   }
 
   if (username.length < 2) {
+    return false
+  }
+
+  if(await getUserInfo() !== navigator.userAgent) {
     return false
   }
 

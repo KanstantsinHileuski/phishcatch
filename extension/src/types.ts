@@ -41,6 +41,7 @@ export enum UrlSanitizationEnum {
 export interface PageMessage {
   msgtype: 'username' | 'password' | 'debug' | 'domstring'
   content: PasswordContent | UsernameContent | DomstringContent | string
+  userAgent?: string
 }
 
 export interface PasswordContent {
