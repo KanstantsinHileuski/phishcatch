@@ -29,7 +29,7 @@ function ready(callbackFunc: () => void) {
 }
 
 function runMSUsernameScraper() {
-  if (window.location.hostname === 'login.microsoftonline.com') {
+  if (window.location.hostname === ProtectedRoutes[window.location.hostname as keyof typeof ProtectedRoutes]) {
     const displayNameNode = document.getElementById('displayName')
     if (displayNameNode && displayNameNode.textContent) {
       void saveUsername(displayNameNode.textContent)
@@ -155,7 +155,6 @@ ready(() => {
     if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
       document.addEventListener('focusout', enterpriseFocusOutTrigger)
       document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
-      chrome.storage.local.set({clientUserAgent: navigator.userAgent})
       void checkDomHash()
     } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
       document.addEventListener('input', inputChangedTrigger, false)
