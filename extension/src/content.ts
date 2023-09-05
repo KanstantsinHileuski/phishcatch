@@ -149,7 +149,7 @@ async function checkIfUrlBanned() {
 }
 
 ready(() => {
-  const host:string = '';
+  const host:string = window.location.hostname;
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setTimeout(async () => {
     if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
