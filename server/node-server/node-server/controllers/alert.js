@@ -45,7 +45,7 @@ export const alert = async (req, res, next) => {
 
     try {
       logger.info(alertMessage);
-      res.status(200).json({ status: "alert success" });
+      res.status(201).json({ status: "alert success" });
     } catch (error) {
       console.error(error);
       res.status(500).json({ status: "Couldn't send alert" });
