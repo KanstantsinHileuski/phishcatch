@@ -51,6 +51,7 @@ export async function saveUsername(username: string): Promise<boolean> {
     return false
   }
 
+
   let currentUsernames = await getUsernames()
   const usernameExists = currentUsernames.some((currentUsername) => {
     return currentUsername.username === username

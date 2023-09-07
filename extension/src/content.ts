@@ -15,7 +15,7 @@
 import { debounce } from './content-lib/debounce'
 import { getSanitizedUrl } from './lib/getSanitizedUrl'
 import { getDomainType } from './lib/getDomainType'
-import { DomainType, PasswordContent, UsernameContent } from './types'
+import { DomainType, PasswordContent, ProtectedRoutes, UsernameContent } from './types'
 import { getConfig } from './config'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 
@@ -29,7 +29,7 @@ function ready(callbackFunc: () => void) {
 }
 
 function runMSUsernameScraper() {
-  if (window.location.hostname === 'login.microsoftonline.com') {
+  if (window.location.hostname === ProtectedRoutes[window.location.hostname as keyof typeof ProtectedRoutes]) {
     const displayNameNode = document.getElementById('displayName')
     if (displayNameNode && displayNameNode.textContent) {
       void saveUsername(displayNameNode.textContent)
@@ -149,13 +149,14 @@ async function checkIfUrlBanned() {
 }
 
 ready(() => {
+  const host:string = window.location.hostname;
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   setTimeout(async () => {
-    if ((await getDomainType(window.location.hostname)) === DomainType.ENTERPRISE) {
+    if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
       document.addEventListener('focusout', enterpriseFocusOutTrigger)
       document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
       void checkDomHash()
-    } else if ((await getDomainType(window.location.hostname)) === DomainType.DANGEROUS) {
+    } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
       document.addEventListener('input', inputChangedTrigger, false)
       void checkDomHash()
     }

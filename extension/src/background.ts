@@ -41,7 +41,7 @@ export async function receiveMessage(message: PageMessage): Promise<void> {
     case 'username': {
       const content = <UsernameContent>message.content
 
-      if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE) {
+      if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE || getHostFromUrl(content.url) ===  ProtectedRoutes[getHostFromUrl(content.url) as keyof typeof ProtectedRoutes]) {
         void saveUsername(content.username)
         void saveDOMHash(content.dom, content.url)
       }

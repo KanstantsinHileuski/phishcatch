@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DomainType } from '../types'
+import { DomainType, ProtectedRoutes } from '../types'
 import { getHostFromUrl } from './getHostFromUrl'
 import { getDomainType } from './getDomainType'
 
@@ -20,7 +20,7 @@ async function updateBadge(tab: chrome.tabs.Tab) {
   if (tab.active && tab.url) {
     const host = getHostFromUrl(tab.url)
 
-    if ((await getDomainType(host)) === DomainType.ENTERPRISE) {
+    if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
       chrome.browserAction.setBadgeText({ text: '✅' })
     } else {
       chrome.browserAction.setBadgeText({ text: '' })

@@ -135,7 +135,11 @@ export enum DomainType {
 }
 
 export enum ProtectedRoutes {
-  'login.microsoftonline.com' = 'login.microsoftonline.com'
+  'login.microsoftonline.com' = 'login.microsoftonline.com',
+  'login.live.com' = 'login.live.com',
+  'signup.live.com' = 'signup.live.com',
+  'account.microsoft.com' = 'account.microsoft.com',
+  'office.com' = 'office.com',
 }
 
 export interface DatedDomHash {
