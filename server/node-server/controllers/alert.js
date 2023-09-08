@@ -1,5 +1,5 @@
 import { logger } from '../logger.js';
-const key = process.env.KEY;
+const key = process.env.API_KEY;
 
 function generateAlertMessage(alert, ip) {
   let message;
@@ -34,11 +34,11 @@ function generateAlertMessage(alert, ip) {
 
 export const alert = async (req, res, next) => {
   try {
-    console.info("Received a credential reuse alert!")
+    console.info("Received a credential reuse alert!", req.body.key, key )
 
-    if (key && req.body.key !== key) {
+    if (key && req.body.key !== key ) {
       console.log(`Alert did not include correct key! Correct key: ${key}. Provided key: ${req.body.key}`);
-      return res.status(400).json({ status: "Incorrect Key" });
+      return res.json({ status: "Incorrect Key" });
     }
 
     let alertMessage = generateAlertMessage(req.body, req.ip);
