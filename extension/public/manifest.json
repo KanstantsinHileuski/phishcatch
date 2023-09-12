@@ -6,6 +6,12 @@
   "icons": {
     "128": "icon.png"
   },
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "storage",
+    "alarms"
+  ],
   "action": {
     "default_popup": "popup.html"
   },
@@ -32,11 +38,9 @@
       ]
     }
   ],
-  "permissions": [
-    "tabs",
-    "bookmarks",
-    "storage",
-    "alarms"
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
   ],
   "optional_permissions": []
 }
