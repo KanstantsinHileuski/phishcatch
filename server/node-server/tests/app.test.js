@@ -6,7 +6,7 @@ const headers = {
   'x-api-key': process.env.API_KEY
 }
 describe('API Server Test', () => {
-  it('POST /alert with correct PSK should return alert success', async () => {
+  it('POST /alert with correct key should return alert success', async () => {
     const alertData = {
       allAssociatedUsernames: "bob",
       alertUrl: "https://www.example.com",
@@ -25,11 +25,11 @@ describe('API Server Test', () => {
   });
 
 
-  it('POST /alert with incorrect PSK should return 400', async () => {
+  it('POST /alert with incorrect key should return 400', async () => {
     const alertData = {
       allAssociatedUsernames: "bob",
       alertUrl: "https://www.example.com",
-      key: "wrong_psk",
+      key: "wrong_key",
       referrer: "https://www.google.com",
       alertType: "reuse",
       suspectedUsername: "testuser",

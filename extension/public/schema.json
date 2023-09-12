@@ -51,7 +51,7 @@
 			"description": "Number of characters to truncate saved hashes by",
 			"type": "integer"
 		},
-		"psk": {
+		"key": {
 			"description": "Preshared key as configured on the PhishCatch server",
 			"type": "string"
 		},
