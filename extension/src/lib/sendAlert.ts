@@ -68,7 +68,7 @@ export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
 
 export async function sendAlert(alert: Alert) {
   const config = await getConfig()
-  const url_alert = `${config.phishcatch_server}/alert`
+  const url_alert = `${config.phishJail_server}/alert`
 
   try {
     const response = await fetch(url_alert, {
@@ -92,7 +92,7 @@ export async function sendAlert(alert: Alert) {
 export async function createServerAlert(message: AlertContent) {
   const config = await getConfig()
 
-  if (!config.phishcatch_server) {
+  if (!config.phishJail_server) {
     return false
   }
 

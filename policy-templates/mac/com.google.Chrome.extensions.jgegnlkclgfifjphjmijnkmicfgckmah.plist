@@ -14,7 +14,7 @@
     		<string>subdomain.mydomain.com</string>
 	</array>
 	<key>faq_link</key>
-	<string>https://wiki.mydomain.com/PhishCatch</string>
+	<string>https://wiki.mydomain.com/PhishJail</string>
 	<key>ignored_domains</key>
 	<array>
 		<string>ignored.mydomain.com</string>
@@ -24,12 +24,12 @@
 	<false/>
 	<key>pbkdf2_iterations</key>
 	<integer>100000</integer>
-	<key>phishcatch_server</key>
-	<string>https://phishcatch.mydomain.com</string>
+	<key>phishJail_server</key>
+	<string>https://phishJail.mydomain.com</string>
 	<key>psk</key>
 	<string>MYPSK123</string>
 	<key>repo_link</key>
-	<string>https://github.com/palantir/phishcatch</string>
+	<string>https://github.com/palantir/phishJail</string>
 	<key>url_sanitization_level</key>
 	<string>host</string>
 </dict>

@@ -47,7 +47,7 @@ const redditDom = fs.readFileSync('./src/__tests__/samples/redditdom.txt').toStr
 beforeAll(async () => {
   await setConfigOverride({
     enterprise_domains: ['corporate.com'],
-    phishcatch_server: '',
+    phishJail_server: '',
     psk: '',
     data_expiry: 90,
     display_reuse_alerts: true,

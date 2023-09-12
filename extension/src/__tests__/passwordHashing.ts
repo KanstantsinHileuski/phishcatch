@@ -49,7 +49,7 @@ describe('Password hashing should work', () => {
   beforeAll(async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
+      phishJail_server: '',
       psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
@@ -62,7 +62,7 @@ describe('Password hashing should work', () => {
   it('A password should always hash to the same value (given the salt is the same)', async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
+      phishJail_server: '',
       psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
@@ -108,7 +108,7 @@ describe('Password hashing should work', () => {
   it('Changing the number of iterations should produce a different result', async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
+      phishJail_server: '',
       psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
@@ -358,7 +358,7 @@ describe('Password message handling works as expected', () => {
   it('Setting expire_hash_on_use should prevent passwords from alerting twice', async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
+      phishJail_server: '',
       psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
@@ -397,7 +397,7 @@ describe('Password hash truncation works', () => {
   beforeAll(async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
+      phishJail_server: '',
       psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,

@@ -75,7 +75,7 @@
  */
 
 // https://raw.githubusercontent.com/trendmicro/tlsh/master/js_ext/tlsh.js
-// modified for use in phishcatch (eg type definitions)
+// modified for use in PhishJail (eg type definitions)
 
 import { TLSHInstance, TLSHQuartile } from '../types'
 

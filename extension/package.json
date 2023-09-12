@@ -1,7 +1,7 @@
 {
-  "name": "phishcatch",
+  "name": "PhishJail",
   "version": "1.0.0",
-  "description": "phishcatch",
+  "description": "PhishJail",
   "main": "index.js",
   "scripts": {
     "watch": "webpack --config webpack/webpack.dev.js --watch",

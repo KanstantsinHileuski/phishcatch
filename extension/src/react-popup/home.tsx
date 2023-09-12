@@ -27,13 +27,13 @@ export function Home() {
     <div>
       <Card>
         <p>
-          PhishCatch is a browser extension that prevents corporate passwords from being leaked and sends infosec an
+          PhishJail is a browser extension that prevents corporate passwords from being leaked and sends infosec an
           alert when they are.
         </p>
       </Card>
 
       <Card style={{ paddingTop: '1.5em', display: 'grid', justifyContent: 'space-evenly', gridAutoFlow: 'column' }}>
-        {popupStore.config.phishcatch_server && (
+        {popupStore.config.phishJail_server && (
           <Button
             intent="success"
             onClick={() => {

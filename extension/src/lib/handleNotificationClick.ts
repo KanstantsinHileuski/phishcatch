@@ -30,7 +30,7 @@ export function handleNotificationClick(notifId: string, btnId: number) {
     if (btnId === 0) {
       const opt: chrome.notifications.NotificationOptions = {
         type: 'basic',
-        title: 'PhishCatch Alert',
+        title: 'PhishJail Alert',
         message: `Reporting false positive and removing matched password`,
         iconUrl: alertIconUrl,
         priority: 2,
@@ -47,7 +47,7 @@ export function handleNotificationClick(notifId: string, btnId: number) {
     } else if (btnId === 1) {
       const opt: chrome.notifications.NotificationOptions = {
         type: 'basic',
-        title: 'PhishCatch Alert',
+        title: 'PhishJail Alert',
         message: `Removing matched password`,
         iconUrl: alertIconUrl,
         priority: 2,

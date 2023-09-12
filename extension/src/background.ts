@@ -103,8 +103,8 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
     const alertIconUrl = chrome.runtime.getURL('icon.png')
     const opt: chrome.notifications.NotificationOptions = {
       type: 'basic',
-      title: 'PhishCatch Alert',
-      message: `PhishCatch has detected enterprise password re-use on the url: ${message.url}\n`,
+      title: 'PhishJail Alert',
+      message: `PhishJail has detected enterprise password re-use on the url: ${message.url}\n`,
       iconUrl: alertIconUrl,
       requireInteraction: true,
       priority: 2,
@@ -123,7 +123,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
 
 function setup() {
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  chrome.runtime.onMessage.addListener(receiveMessage)
+  chrome.runtime.onMessageExternal.addListener(receiveMessage)
   chrome.notifications.onButtonClicked.addListener(handleNotificationClick)
 
   void showCheckmarkIfEnterpriseDomain()

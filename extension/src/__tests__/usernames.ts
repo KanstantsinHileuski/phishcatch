@@ -77,7 +77,7 @@ describe('Usernames should be saved and retrieved correctly', () => {
   it('Usernames must match a username regex if one is defined', async () => {
     await setConfigOverride({
       enterprise_domains: [],
-      phishcatch_server: '',
+      phishJail_server: '',
       psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
