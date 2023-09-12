@@ -3,6 +3,6 @@ import { alert } from "../controllers/alert.js";
 
 const alertRoute = express.Router();
 
-alertRoute.get("/alert", alert)
+alertRoute.post("/alert", alert)
 
 export default alertRoute

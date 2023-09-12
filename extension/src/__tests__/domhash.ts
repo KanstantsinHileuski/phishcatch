@@ -48,7 +48,7 @@ beforeAll(async () => {
   await setConfigOverride({
     enterprise_domains: ['corporate.com'],
     phishcatch_server: '',
-    psk: '',
+    key: '',
     data_expiry: 90,
     display_reuse_alerts: true,
     ignored_domains: [ignoredUrl],

@@ -34,7 +34,7 @@ const defaults: Prefs = {
   manual_password_entry: false,
   argon2_iterations: 2,
   phishcatch_server: '',
-  psk: '',
+  key: '',
   repo_link: null,
   url_sanitization_level: UrlSanitizationEnum.host,
   username_regexes: [],

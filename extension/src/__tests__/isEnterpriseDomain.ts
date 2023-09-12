@@ -33,7 +33,7 @@ beforeAll(async () => {
   await setConfigOverride({
     enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain, wildcardEnterpriseSubDomain],
     phishcatch_server: '',
-    psk: '',
+    key: '',
     data_expiry: 90,
     display_reuse_alerts: true,
     ignored_domains: [ignoredDomain, wildcardIgnoredDomain],
@@ -102,7 +102,7 @@ describe('We should be able to identify enterprise and ignored domains', () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain, getHostFromUrl(enterpriseUrlWithoutTLD)],
       phishcatch_server: '',
-      psk: '',
+      key: '',
       data_expiry: 90,
       display_reuse_alerts: true,
       ignored_domains: [ignoredDomain, wildcardIgnoredDomain],
