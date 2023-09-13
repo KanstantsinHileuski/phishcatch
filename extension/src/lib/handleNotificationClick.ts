@@ -34,9 +34,12 @@ export function handleNotificationClick(notifId: string, btnId: number) {
         message: `Reporting false positive and removing matched password`,
         iconUrl: alertIconUrl,
         priority: 2,
+        buttons: [{title: 'PhishJail Alert'}]
       }
 
-      chrome.notifications.create(opt)
+      chrome.notifications.create(opt, () => {
+        console.log("notification is created")
+      })
 
       void createServerAlert({
         referrer: '',
@@ -53,7 +56,9 @@ export function handleNotificationClick(notifId: string, btnId: number) {
         priority: 2,
       }
 
-      chrome.notifications.create(opt)
+      chrome.notifications.create(opt, () => {
+        console.log("notification is created")
+      })
 
       void createServerAlert({
         referrer: '',
