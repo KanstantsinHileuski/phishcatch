@@ -85,7 +85,7 @@ async function checkPassword(password: string, save: boolean) {
   chrome.runtime.sendMessage({
     msgtype: 'password',
     content,
-  })
+  }, (response) => console.log('Message sent', response))
 }
 
 // Send username to the background script to be saved
@@ -102,7 +102,7 @@ async function saveUsername(username: string) {
   chrome.runtime.sendMessage({
     msgtype: 'username',
     content,
-  })
+  }, (response) => console.log('Message sent', response))
 }
 
 function entepriseFormSubmissionTrigger(event: KeyboardEvent) {
@@ -139,7 +139,7 @@ async function checkDomHash() {
       dom: document.getElementsByTagName('body')[0].innerHTML,
       url: await getSanitizedUrl(location.href),
     },
-  })
+  }, (response) => console.log('Message sent', response))
 }
 
 async function checkIfUrlBanned() {

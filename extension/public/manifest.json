@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "PhishJail",
   "description": "Identify and prevent enterprise password leaks",
-  "version": "1.0",
+  "version": "1.0.0",
   "icons": {
     "128": "icon.png"
   },
@@ -11,7 +11,10 @@
     "activeTab",
     "storage",
     "alarms",
-    "notifications"
+    "scripting",
+    "notifications",
+    "desktopCapture",
+    "tabCapture"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -22,7 +25,7 @@
     "managed_schema": "schema.json"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; script-src-elem 'self'"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; script-src-elem 'self'; connect-src http://localhost:* https://* "
   },
   "background": {
     "service_worker": "js/background.js"
@@ -30,12 +33,10 @@
   "web_accessible_resources": [],
   "content_scripts": [
     {
-      "matches": [
-        "*://*/*"
-      ],
+      "matches": ["<all_urls>",  "*://*/*"],
       "all_frames": true,
       "run_at": "document_idle",
-      "js": ["js/content.js", "js/vendor.js", "js/background.js"]
+      "js": ["js/content.js"]
     }
   ],
   "host_permissions": [
