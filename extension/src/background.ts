@@ -122,12 +122,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
 }
 
 function setup() {
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.message === "messageSent") {
-      receiveMessage(request.message);
-    }
-  })
+  chrome.runtime.onMessage.addListener(receiveMessage)
   chrome.notifications.onButtonClicked.addListener(handleNotificationClick)
 
   void showCheckmarkIfEnterpriseDomain()

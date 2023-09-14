@@ -23,7 +23,7 @@
     "managed_schema": "schema.json"
   },
   "content_security_policy": {
-    "extension_pages":  "default-src 'self'; script-src 'self' 'wasm-unsafe-eval';  style-src 'self'; script-src-elem 'self' 'unsafe-inline';"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src http://localhost:* https://*"
   },
   "background": {
     "service_worker": "js/background.js",
@@ -32,10 +32,15 @@
   "web_accessible_resources": [],
   "content_scripts": [
     {
+      "matches": [
+        "*://*/*"
+      ],
       "all_frames": true,
-      "js": ["js/content.js"],
-      "matches": ["<all_urls>"],
-      "run_at": "document_start"
+      "run_at": "document_idle",
+      "js": [
+        "js/content.js",
+        "js/vendor.js"
+      ]
     }
   ],
   "host_permissions": [
