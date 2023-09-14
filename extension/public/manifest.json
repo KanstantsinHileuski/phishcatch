@@ -13,30 +13,29 @@
     "alarms",
     "scripting",
     "notifications",
-    "desktopCapture",
     "tabCapture"
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "PhishJail",
     "default_icon": "icon.png"
   },
   "storage": {
     "managed_schema": "schema.json"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; script-src-elem 'self'; connect-src http://localhost:* https://* "
+    "extension_pages":  "default-src 'self'; script-src 'self' 'wasm-unsafe-eval';  style-src 'self'; script-src-elem 'self' 'unsafe-inline';"
   },
   "background": {
-    "service_worker": "js/background.js"
+    "service_worker": "js/background.js",
+    "type": "module"
   },
   "web_accessible_resources": [],
   "content_scripts": [
     {
-      "matches": ["<all_urls>",  "*://*/*"],
       "all_frames": true,
-      "run_at": "document_idle",
-      "js": ["js/content.js"]
+      "js": ["js/content.js"],
+      "matches": ["<all_urls>"],
+      "run_at": "document_start"
     }
   ],
   "host_permissions": [
