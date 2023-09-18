@@ -18,6 +18,8 @@ import { getDomainType } from './lib/getDomainType'
 import { DomainType, PasswordContent, ProtectedRoutes, UsernameContent } from './types'
 import { getConfig } from './config'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
+import { getHostFromUrl } from "./lib/getHostFromUrl";
+
 
 // wait for page to load before doing anything
 function ready(callbackFunc: () => void) {
@@ -106,6 +108,7 @@ async function saveUsername(username: string) {
 }
 
 function entepriseFormSubmissionTrigger(event: KeyboardEvent) {
+  console.log(event)
   if (event.key == 'U+000A' || event.key == 'Enter' || event.keyCode == 13) {
     const target = event.target as HTMLInputElement
     if (target.nodeName === 'INPUT' && target.type === 'password') {
@@ -116,6 +119,7 @@ function entepriseFormSubmissionTrigger(event: KeyboardEvent) {
 }
 
 function enterpriseFocusOutTrigger(event: FocusEvent) {
+  console.log(event)
   const target = event.target as HTMLInputElement
   if (target.nodeName === 'INPUT' && target.type === 'password') {
     void checkPassword(target.value, true)
@@ -149,16 +153,19 @@ async function checkIfUrlBanned() {
 }
 
 ready(async() => {
-  const host:string = window.location.hostname;
+  const host = getHostFromUrl(window.location.href);
 
-    if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
-      document.addEventListener('focusout', enterpriseFocusOutTrigger)
+  setTimeout(async () => {
+    console.log('content', await getDomainType(host), host);
+    if (await getDomainType(host) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
+      document.addEventListener('focusout', enterpriseFocusOutTrigger, true)
       document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
       void checkDomHash()
     } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
-      document.addEventListener('input', inputChangedTrigger, false)
+      document.addEventListener('input', inputChangedTrigger, true)
       void checkDomHash()
     }
+  }, 1000)
 })
 
 checkIfUrlBanned()

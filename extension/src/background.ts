@@ -33,100 +33,108 @@ import { getHostFromUrl } from './lib/getHostFromUrl'
 import { timedCleanup } from './lib/timedCleanup'
 import { addNotification, handleNotificationClick } from './lib/handleNotificationClick'
 
-export async function receiveMessage(message: PageMessage): Promise<void> {
-  switch (message.msgtype) {
-    case 'debug': {
-      break
-    }
-    case 'username': {
-      const content = <UsernameContent>message.content
 
-      if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE || getHostFromUrl(content.url) ===  ProtectedRoutes[getHostFromUrl(content.url) as keyof typeof ProtectedRoutes]) {
-        void saveUsername(content.username)
-        void saveDOMHash(content.dom, content.url)
-      }
-      break
-    }
-    case 'password': {
-      const content = <PasswordContent>message.content
-      if (content.password) {
-        void handlePasswordEntry(content)
-      }
-      break
-    }
-    case 'domstring': {
-      const content = <DomstringContent>message.content
-      void checkDOMHash(content.dom, content.url)
-      break
-    }
-  }
-}
+// export async function receiveMessage(message: PageMessage): Promise<void | boolean> {
+//   switch (message.msgtype) {
+//     case 'debug': {
+//       break
+//     }
+//     case 'username': {
+//       const content = <UsernameContent>message.content
+//
+//       if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE || getHostFromUrl(content.url) ===  ProtectedRoutes[getHostFromUrl(content.url) as keyof typeof ProtectedRoutes]) {
+//         void saveUsername(content.username)
+//         void saveDOMHash(content.dom, content.url)
+//       }
+//       break
+//     }
+//     case 'password': {
+//       const content = <PasswordContent>message.content
+//       if (content.password) {
+//         // void handlePasswordEntry(content)
+//       }
+//       break
+//     }
+//     case 'domstring': {
+//       const content = <DomstringContent>message.content
+//       void checkDOMHash(content.dom, content.url)
+//       Promise.resolve("")
+//       break
+//     }
+//   }
+// }
 
-//check if the site the password was entered into is a corporate site
-export async function handlePasswordEntry(message: PasswordContent) {
-  const url = message.url
-  const host = getHostFromUrl(url)
-  const password = message.password
-  const protectedRoute = ProtectedRoutes[host as keyof typeof ProtectedRoutes]
+// //check if the site the password was entered into is a corporate site
+// export async function handlePasswordEntry(message: PasswordContent) {
+//   const url = message.url
+//   const host = getHostFromUrl(url)
+//   const password = message.password
+//   const protectedRoute = ProtectedRoutes[host as keyof typeof ProtectedRoutes]
+//
+//   if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === protectedRoute) {
+//     if (message.save) {
+//       await hashAndSavePassword(password, message.username, host)
+//       return PasswordHandlingReturnValue.EnterpriseSave
+//     }
+//     return PasswordHandlingReturnValue.EnterpriseNoSave
+//   } else if ((await getDomainType(host)) === DomainType.DANGEROUS || host !==  protectedRoute) {
+//     const hashData = await getHashDataIfItExists(password)
+//     if (hashData) {
+//       await handlePasswordLeak(message, hashData)
+//       return PasswordHandlingReturnValue.ReuseAlert
+//     }
+//   } else {
+//     return PasswordHandlingReturnValue.IgnoredDomain
+//   }
+//
+//   return PasswordHandlingReturnValue.NoReuse
+// }
+//
+// async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHash) {
+//   const config = await getConfig()
+//   const alertContent = {
+//     ...message,
+//     alertType: AlertTypes.REUSE,
+//     associatedHostname: hashData.hostname || '',
+//     associatedUsername: hashData.username || '',
+//   }
+//
+//   void createServerAlert(alertContent)
+//
+//   if (config.display_reuse_alerts) {
+//     const alertIconUrl = chrome.runtime.getURL('icon.png')
+//     const opt: chrome.notifications.NotificationOptions = {
+//       type: 'basic',
+//       title: 'PhishJail Alert',
+//       message: `PhishJail has detected enterprise password re-use on the url: ${message.url}\n`,
+//       iconUrl: alertIconUrl,
+//       requireInteraction: true,
+//       priority: 2,
+//       buttons: [{ title: 'This is a false positive' }, { title: `That wasn't my enterprise password` }],
+//     }
+//
+//     chrome.notifications.create(opt, (id) => {
+//       addNotification({ id, hash: hashData.hash, url: message.url })
+//     })
+//   }
+//
+//   if (config.expire_hash_on_use) {
+//     await removeHash(hashData.hash)
+//   }
+// }
+//
 
-  if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === protectedRoute) {
-    if (message.save) {
-      await hashAndSavePassword(password, message.username, host)
-      return PasswordHandlingReturnValue.EnterpriseSave
-    }
-    return PasswordHandlingReturnValue.EnterpriseNoSave
-  } else if ((await getDomainType(host)) === DomainType.DANGEROUS || host !==  protectedRoute) {
-    const hashData = await getHashDataIfItExists(password)
-    if (hashData) {
-      await handlePasswordLeak(message, hashData)
-      return PasswordHandlingReturnValue.ReuseAlert
-    }
-  } else {
-    return PasswordHandlingReturnValue.IgnoredDomain
-  }
-
-  return PasswordHandlingReturnValue.NoReuse
-}
-
-async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHash) {
-  const config = await getConfig()
-  const alertContent = {
-    ...message,
-    alertType: AlertTypes.REUSE,
-    associatedHostname: hashData.hostname || '',
-    associatedUsername: hashData.username || '',
-  }
-
-  void createServerAlert(alertContent)
-
-  if (config.display_reuse_alerts) {
-    const alertIconUrl = chrome.runtime.getURL('icon.png')
-    const opt: chrome.notifications.NotificationOptions = {
-      type: 'basic',
-      title: 'PhishJail Alert',
-      message: `PhishJail has detected enterprise password re-use on the url: ${message.url}\n`,
-      iconUrl: alertIconUrl,
-      requireInteraction: true,
-      priority: 2,
-      buttons: [{ title: 'This is a false positive' }, { title: `That wasn't my enterprise password` }],
-    }
-
-    chrome.notifications.create(opt, (id) => {
-      addNotification({ id, hash: hashData.hash, url: message.url })
-    })
-  }
-
-  if (config.expire_hash_on_use) {
-    await removeHash(hashData.hash)
-  }
-}
 
 function setup() {
-  chrome.runtime.onMessage.addListener(receiveMessage)
-  chrome.notifications.onButtonClicked.addListener(handleNotificationClick)
+  console.log('background')
+  chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
+    console.log(message)
+    sendResponse(message.content);
+  });
+  // chrome.notifications.onButtonClicked.addListener(handleNotificationClick)
 
-  void showCheckmarkIfEnterpriseDomain()
-  timedCleanup()
+  // void showCheckmarkIfEnterpriseDomain()
+  // timedCleanup()
 }
 
 setup()
