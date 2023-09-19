@@ -20,7 +20,6 @@ import { getConfig } from './config'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 import { getHostFromUrl } from "./lib/getHostFromUrl";
 
-
 // wait for page to load before doing anything
 function ready(callbackFunc: () => void) {
   if (document.readyState !== 'loading') {
@@ -76,6 +75,8 @@ async function checkPassword(password: string, save: boolean) {
     username = await scrapeUsernames()
   }
 
+  console.log(username, password)
+
   const content: PasswordContent = {
     password,
     username,
@@ -83,11 +84,24 @@ async function checkPassword(password: string, save: boolean) {
     url: await getSanitizedUrl(location.href),
     referrer: await getSanitizedUrl(document.referrer),
     timestamp: new Date().getTime(),
-  }
+  };
+
   chrome.runtime.sendMessage({
     msgtype: 'password',
     content,
   })
+
+  // test
+  // try{
+  //   chrome.runtime.sendMessage({
+  //     msgtype: 'password',
+  //     content,
+  //   }, function (response) {
+  //     console.log(response);
+  //   })
+  // }catch (e) {
+  //   console.log(e)
+  // }
 }
 
 // Send username to the background script to be saved
@@ -100,15 +114,27 @@ async function saveUsername(username: string) {
     username,
     url: await getSanitizedUrl(location.href),
     dom: document.getElementsByTagName('body')[0].innerHTML,
-  }
+  };
+
   chrome.runtime.sendMessage({
     msgtype: 'username',
     content,
-  })
+  });
+
+  //test
+  // try {
+  //   chrome.runtime.sendMessage({
+  //     msgtype: 'username',
+  //     content,
+  //   }, function (response) {
+  //     console.log(response);
+  //   })
+  // }catch (e) {
+  //   console.log(e)
+  // }
 }
 
 function entepriseFormSubmissionTrigger(event: KeyboardEvent) {
-  console.log(event)
   if (event.key == 'U+000A' || event.key == 'Enter' || event.keyCode == 13) {
     const target = event.target as HTMLInputElement
     if (target.nodeName === 'INPUT' && target.type === 'password') {
@@ -119,7 +145,6 @@ function entepriseFormSubmissionTrigger(event: KeyboardEvent) {
 }
 
 function enterpriseFocusOutTrigger(event: FocusEvent) {
-  console.log(event)
   const target = event.target as HTMLInputElement
   if (target.nodeName === 'INPUT' && target.type === 'password') {
     void checkPassword(target.value, true)
@@ -127,16 +152,22 @@ function enterpriseFocusOutTrigger(event: FocusEvent) {
 }
 
 // Debounce password checks to avoid hashing the password on every single input
-const debouncedCheckPassword = debounce(checkPassword, 100)
+// const debouncedCheckPassword = debounce(checkPassword, 100)
 
 function inputChangedTrigger(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.nodeName === 'INPUT' && target.type === 'password') {
-    debouncedCheckPassword(target.value, true)
+    void checkPassword(target.value, true)
   }
 }
 
 async function checkDomHash() {
+  const content = {
+    dom: document.getElementsByTagName('body')[0].innerHTML,
+    url: await getSanitizedUrl(location.href),
+  };
+
+  // Working example
   chrome.runtime.sendMessage({
     msgtype: 'domstring',
     content: {
@@ -144,6 +175,31 @@ async function checkDomHash() {
       url: await getSanitizedUrl(location.href),
     },
   })
+
+  //test
+  // chrome.runtime.sendMessage({msgtype: "domstring", content}, function (response) {
+  //   console.log(response)
+  // })
+
+  //test
+  // ( async () =>{
+  //   const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
+  //   const response = await chrome.tabs.sendMessage( tab.id, {msgtype: "domstring", content});
+  //   console.log(response);
+  // })();
+
+  //test
+  // return new Promise((resolve, reject) => {
+  //     chrome.tabs.query({currentWindow: true, active: true}, (tab) => {
+  //       chrome.tabs.sendMessage(tab[0].id!, {msgtype: "domstring", content}, response => {
+  //         if (response.complete) {
+  //           resolve('');
+  //         } else {
+  //           reject('Something wrong');
+  //         }
+  //       });
+  //     })
+  // });
 }
 
 async function checkIfUrlBanned() {
@@ -155,17 +211,15 @@ async function checkIfUrlBanned() {
 ready(async() => {
   const host = getHostFromUrl(window.location.href);
 
-  setTimeout(async () => {
-    console.log('content', await getDomainType(host), host);
-    if (await getDomainType(host) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
-      document.addEventListener('focusout', enterpriseFocusOutTrigger, true)
-      document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
-      void checkDomHash()
-    } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
-      document.addEventListener('input', inputChangedTrigger, true)
-      void checkDomHash()
-    }
-  }, 1000)
+  console.log('content', await getDomainType(host), host);
+  if (await getDomainType(host) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
+    document.addEventListener('focusout', enterpriseFocusOutTrigger, true)
+    document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
+    void checkDomHash()
+  } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
+    document.addEventListener('input', inputChangedTrigger, true)
+    void checkDomHash()
+  }
 })
 
 checkIfUrlBanned()

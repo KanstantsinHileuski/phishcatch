@@ -30,11 +30,12 @@ import { showCheckmarkIfEnterpriseDomain } from './lib/showCheckmarkIfEnterprise
 import { createServerAlert } from './lib/sendAlert'
 import { getDomainType } from './lib/getDomainType'
 import { getHostFromUrl } from './lib/getHostFromUrl'
-import { timedCleanup } from './lib/timedCleanup'
 import { addNotification, handleNotificationClick } from './lib/handleNotificationClick'
 
 
-// export async function receiveMessage(message: PageMessage): Promise<void | boolean> {
+// code is commented because async/await parts make app to crush
+
+// export async function receiveMessage(message: PageMessage): Promise<void> {
 //   switch (message.msgtype) {
 //     case 'debug': {
 //       break
@@ -43,22 +44,21 @@ import { addNotification, handleNotificationClick } from './lib/handleNotificati
 //       const content = <UsernameContent>message.content
 //
 //       if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE || getHostFromUrl(content.url) ===  ProtectedRoutes[getHostFromUrl(content.url) as keyof typeof ProtectedRoutes]) {
-//         void saveUsername(content.username)
-//         void saveDOMHash(content.dom, content.url)
+//         await saveUsername(content.username)
+//         await saveDOMHash(content.dom, content.url)
 //       }
 //       break
 //     }
 //     case 'password': {
 //       const content = <PasswordContent>message.content
 //       if (content.password) {
-//         // void handlePasswordEntry(content)
+//         await handlePasswordEntry(content)
 //       }
 //       break
 //     }
 //     case 'domstring': {
 //       const content = <DomstringContent>message.content
-//       void checkDOMHash(content.dom, content.url)
-//       Promise.resolve("")
+//       await checkDOMHash(content.dom, content.url)
 //       break
 //     }
 //   }
@@ -122,19 +122,87 @@ import { addNotification, handleNotificationClick } from './lib/handleNotificati
 //     await removeHash(hashData.hash)
 //   }
 // }
-//
+
 
 
 function setup() {
   console.log('background')
-  chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
-    console.log(message)
-    sendResponse(message.content);
-  });
-  // chrome.notifications.onButtonClicked.addListener(handleNotificationClick)
 
+  chrome.runtime.onMessage.addListener(   (message, sender, sendResponse) => {
+    switch (message.msgtype) {
+    case 'debug': {
+      break
+    }
+    case 'username': {
+      const content = <UsernameContent>message.content
+      console.log(content)
+      break
+    }
+    case 'password': {
+      const content = <PasswordContent>message.content
+      console.log(content)
+      break
+    }
+    case 'domstring': {
+      const content = <DomstringContent>message.content
+      console.log(content)
+      break
+    }
+  }
+  });
+
+  // test wrapper returns promise to keep channel open
+  // const wrapAsyncFunction = (listener: any) => (message:any, sender:any, sendResponse:any) => {
+  //   Promise.resolve(listener(message, sender)).then(sendResponse);
+  //   return true;
+  // };
+
+  // test
+  // const response = new Promise(resolve => {
+  //   chrome.runtime.onMessage.addListener(function listener(message) {
+  //     if (message.msgtype === 'username') {
+  //       resolve(message.content);
+  //     }
+  //   });
+  // });
+
+
+  // these whole chunks needed to work according docs and search results
+  // chrome.runtime.onMessage.addListener(  async (message, sender, sendResponse) => {
+    // new Promise(async send => {
+    //   const key = await receiveMessage(message)
+    //   send(key);
+    // }).then(sendResponse)
+    // return true;
+
+    // chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    //   chrome.tabs.sendMessage(tabs[0].id!, {fileData: message}, function(response) {
+    //     // console.log(response)
+    //   });
+    // });
+    // return true
+
+    // (async () => {
+    //   const response = await receiveMessage(message)
+    //   console.log(response)
+    //   sendResponse(message)
+    // })()
+    // return true
+
+    // receiveMessage(message).then(sendResponse).catch(e => {
+    //   console.log(e)
+    // })
+    // return Promise.resolve("Dummy response to keep the console quiet");
+
+    // wrapAsyncFunction(async (message:any, sender:any) => {
+    //   console.log(message, sender);
+    //   const response = await receiveMessage(message)
+    //   return response;
+    // })
+  // });
+
+  // chrome.notifications.onButtonClicked.addListener(handleNotificationClick)
   // void showCheckmarkIfEnterpriseDomain()
-  // timedCleanup()
 }
 
 setup()
