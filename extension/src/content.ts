@@ -19,6 +19,9 @@ import { DomainType, PasswordContent, ProtectedRoutes, UsernameContent } from '.
 import { getConfig } from './config'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 import { getHostFromUrl } from "./lib/getHostFromUrl";
+import {checkDOMHash, saveDOMHash} from "./lib/domhash";
+import { handlePasswordEntry } from './lib/handlePassword'
+import {showCheckmarkIfEnterpriseDomain} from "./lib/showCheckmarkIfEnterpriseDomain";
 
 // wait for page to load before doing anything
 function ready(callbackFunc: () => void) {
@@ -89,19 +92,9 @@ async function checkPassword(password: string, save: boolean) {
   chrome.runtime.sendMessage({
     msgtype: 'password',
     content,
+  }, async (res) => {
+    await handlePasswordEntry(res)
   })
-
-  // test
-  // try{
-  //   chrome.runtime.sendMessage({
-  //     msgtype: 'password',
-  //     content,
-  //   }, function (response) {
-  //     console.log(response);
-  //   })
-  // }catch (e) {
-  //   console.log(e)
-  // }
 }
 
 // Send username to the background script to be saved
@@ -119,19 +112,12 @@ async function saveUsername(username: string) {
   chrome.runtime.sendMessage({
     msgtype: 'username',
     content,
+  }, async (content) => {
+     if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE || getHostFromUrl(content.url) ===  ProtectedRoutes[getHostFromUrl(content.url) as keyof typeof ProtectedRoutes]) {
+       await saveUsername(content.username)
+        await saveDOMHash(content.dom, content.url)
+     }
   });
-
-  //test
-  // try {
-  //   chrome.runtime.sendMessage({
-  //     msgtype: 'username',
-  //     content,
-  //   }, function (response) {
-  //     console.log(response);
-  //   })
-  // }catch (e) {
-  //   console.log(e)
-  // }
 }
 
 function entepriseFormSubmissionTrigger(event: KeyboardEvent) {
@@ -162,44 +148,15 @@ function inputChangedTrigger(event: Event) {
 }
 
 async function checkDomHash() {
-  const content = {
-    dom: document.getElementsByTagName('body')[0].innerHTML,
-    url: await getSanitizedUrl(location.href),
-  };
-
-  // Working example
   chrome.runtime.sendMessage({
     msgtype: 'domstring',
     content: {
       dom: document.getElementsByTagName('body')[0].innerHTML,
       url: await getSanitizedUrl(location.href),
     },
+  }, async (res) => {
+    await checkDOMHash(res.dom, res.url)
   })
-
-  //test
-  // chrome.runtime.sendMessage({msgtype: "domstring", content}, function (response) {
-  //   console.log(response)
-  // })
-
-  //test
-  // ( async () =>{
-  //   const [tab] = await chrome.tabs.query({active: true, currentWindow: true});
-  //   const response = await chrome.tabs.sendMessage( tab.id, {msgtype: "domstring", content});
-  //   console.log(response);
-  // })();
-
-  //test
-  // return new Promise((resolve, reject) => {
-  //     chrome.tabs.query({currentWindow: true, active: true}, (tab) => {
-  //       chrome.tabs.sendMessage(tab[0].id!, {msgtype: "domstring", content}, response => {
-  //         if (response.complete) {
-  //           resolve('');
-  //         } else {
-  //           reject('Something wrong');
-  //         }
-  //       });
-  //     })
-  // });
 }
 
 async function checkIfUrlBanned() {
@@ -220,6 +177,7 @@ ready(async() => {
     document.addEventListener('input', inputChangedTrigger, true)
     void checkDomHash()
   }
+  void showCheckmarkIfEnterpriseDomain()
 })
 
 checkIfUrlBanned()

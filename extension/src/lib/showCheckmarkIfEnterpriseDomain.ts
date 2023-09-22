@@ -31,7 +31,6 @@ async function updateBadge(tab: chrome.tabs.Tab) {
 }
 
 export async function showCheckmarkIfEnterpriseDomain() {
-  console.log('checkmark')
   try {
     // @ts-ignore
     chrome.action.setBadgeBackgroundColor({ color: 'green' })
