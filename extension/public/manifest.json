@@ -7,7 +7,7 @@
     "128": "icon.png"
   },
   "permissions": [
-    "storage", "contextMenus","background", "tts", "webNavigation", "activeTab", "tabs", "scripting", "notifications"
+    "storage", "contextMenus","background", "webNavigation", "activeTab", "tabs", "scripting", "notifications"
   ],
   "action": {
     "default_popup": "popup.html",

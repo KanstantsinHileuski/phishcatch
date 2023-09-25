@@ -15,7 +15,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import * as crypto from 'crypto'
-// import { handlePasswordEntry } from '../background'
+import { handlePasswordEntry } from "../lib/handlePassword";
 import { hashPasswordWithSalt } from '../lib/generateHash'
 import { getPasswordHashes, checkStoredHashes, hashAndSavePassword, removeHash } from '../lib/userInfo'
 import { setConfigOverride } from '../config'

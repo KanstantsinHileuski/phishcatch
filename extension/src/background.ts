@@ -12,8 +12,68 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {PageMessage,} from './types'
+const notificationStorage: any = []
+
+import { PageMessage } from './types'
 export function receiveMessage(message: PageMessage) {
+  if(message.msgtype === 'notification') {
+    const { opt } = message.content
+
+    chrome.notifications.create(opt, (id: string) => {
+      notificationStorage.push({id, opt})
+    })
+
+    chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
+      const notificationData = notificationStorage.find((data: any) => data.id === notificationId);
+
+      if (notificationData) {
+        const alertIconUrl = chrome.runtime.getURL('icon.png')
+        if (buttonIndex === 0) {
+          const opt: chrome.notifications.NotificationOptions = {
+            type: 'basic',
+            title: 'PhishJail Alert',
+            message: `Reporting false positive and removing matched password`,
+            iconUrl: alertIconUrl,
+            priority: 2,
+            buttons: [{title: 'PhishJail Alert'}]
+          }
+
+          chrome.notifications.create(opt, () => {
+            console.log("notification is created")
+          })
+
+          // void createServerAlert({
+          //   referrer: '',
+          //   url: notificationData.url,
+          //   timestamp: new Date().getTime(),
+          //   alertType: AlertTypes.FALSEPOSITIVE,
+          // })
+
+        } else if (buttonIndex === 1) {
+          const opt: chrome.notifications.NotificationOptions = {
+            type: 'basic',
+            title: 'PhishJail Alert',
+            message: `Removing matched password`,
+            iconUrl: alertIconUrl,
+            priority: 2,
+          }
+
+          chrome.notifications.create(opt, () => {
+            console.log("notification is created")
+          })
+
+          // void createServerAlert({
+          //   referrer: '',
+          //   url: notificationData.url,
+          //   timestamp: new Date().getTime(),
+          //   alertType: AlertTypes.FALSEPOSITIVE,
+          // })
+        }
+
+        // void removeHash(notificationData.hash)
+      }
+    })
+  }
   return message.content;
 }
 
@@ -22,7 +82,7 @@ function setup() {
     let data = receiveMessage(message)
     sendResponse(data)
   });
-  // chrome.notifications.onButtonClicked.addListener(handleNotificationClick)
+
   // void showCheckmarkIfEnterpriseDomain()
 }
 

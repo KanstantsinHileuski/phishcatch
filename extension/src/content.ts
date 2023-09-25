@@ -137,9 +137,6 @@ function enterpriseFocusOutTrigger(event: FocusEvent) {
   }
 }
 
-// Debounce password checks to avoid hashing the password on every single input
-// const debouncedCheckPassword = debounce(checkPassword, 100)
-
 function inputChangedTrigger(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.nodeName === 'INPUT' && target.type === 'password') {

@@ -1,4 +1,4 @@
-import {getHostFromUrl} from "./getHostFromUrl";
+import { getHostFromUrl } from "./getHostFromUrl";
 import {
   AlertTypes,
   DomainType,
@@ -7,11 +7,10 @@ import {
   PasswordHash,
   ProtectedRoutes
 } from "../types";
-import {getDomainType} from "./getDomainType";
-import {getHashDataIfItExists, hashAndSavePassword, removeHash} from "./userInfo";
-import {getConfig} from "../config";
-import {createServerAlert} from "./sendAlert";
-import {addNotification} from "./handleNotificationClick";
+import { getDomainType } from "./getDomainType";
+import { getHashDataIfItExists, hashAndSavePassword, removeHash } from "./userInfo";
+import { getConfig } from "../config";
+import { createServerAlert } from "./sendAlert";
 
 export async function handlePasswordEntry(message: PasswordContent) {
   const url = message.url
@@ -61,13 +60,14 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
         buttons: [{title: 'This is a false positive'}, {title: `That wasn't my enterprise password`}],
       }
 
-      alert(opt.message)
-      addNotification({id: hashData.hash, hash: hashData.hash, url: message.url})
-
-      // chrome.notifications.create(opt, (id) => {
-      //   console.log(opt)
-      //   addNotification({id, hash: hashData.hash, url: message.url})
-      // })
+      chrome.runtime.sendMessage({
+        msgtype: 'notification',
+        content: {
+          opt,
+          hashData,
+          url: message.url
+        }
+      })
   }
 
   if (config.expire_hash_on_use) {
