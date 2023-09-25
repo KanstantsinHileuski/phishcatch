@@ -50,20 +50,24 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
   void createServerAlert(alertContent)
 
   if (config.display_reuse_alerts) {
-    const alertIconUrl = chrome.runtime.getURL('icon.png')
-    const opt: chrome.notifications.NotificationOptions = {
-      type: 'basic',
-      title: 'PhishJail Alert',
-      message: `PhishJail has detected enterprise password re-use on the url: ${message.url}\n`,
-      iconUrl: alertIconUrl,
-      requireInteraction: true,
-      priority: 2,
-      buttons: [{ title: 'This is a false positive' }, { title: `That wasn't my enterprise password` }],
-    }
+      const alertIconUrl = chrome.runtime.getURL('icon.png')
+      const opt: chrome.notifications.NotificationOptions = {
+        type: 'basic',
+        title: 'PhishJail Alert',
+        message: `PhishJail has detected enterprise password re-use on the url: ${message.url}\n`,
+        iconUrl: alertIconUrl,
+        requireInteraction: true,
+        priority: 2,
+        buttons: [{title: 'This is a false positive'}, {title: `That wasn't my enterprise password`}],
+      }
 
-    chrome.notifications.create(opt, (id) => {
-      addNotification({ id, hash: hashData.hash, url: message.url })
-    })
+      alert(opt.message)
+      addNotification({id: hashData.hash, hash: hashData.hash, url: message.url})
+
+      // chrome.notifications.create(opt, (id) => {
+      //   console.log(opt)
+      //   addNotification({id, hash: hashData.hash, url: message.url})
+      // })
   }
 
   if (config.expire_hash_on_use) {

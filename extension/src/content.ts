@@ -155,7 +155,11 @@ async function checkDomHash() {
       url: await getSanitizedUrl(location.href),
     },
   }, async (res) => {
-    await checkDOMHash(res.dom, res.url)
+    if (document.addEventListener) {
+      document.addEventListener('DOMContentLoaded', async () => {
+        await checkDOMHash(res.dom, res.url)
+      })
+    }
   })
 }
 
@@ -167,6 +171,7 @@ async function checkIfUrlBanned() {
 
 ready(async() => {
   const host = getHostFromUrl(window.location.href);
+  void showCheckmarkIfEnterpriseDomain()
 
   console.log('content', await getDomainType(host), host);
   if (await getDomainType(host) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
@@ -177,7 +182,7 @@ ready(async() => {
     document.addEventListener('input', inputChangedTrigger, true)
     void checkDomHash()
   }
-  void showCheckmarkIfEnterpriseDomain()
+
 })
 
 checkIfUrlBanned()

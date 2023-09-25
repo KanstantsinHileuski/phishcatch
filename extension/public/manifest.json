@@ -36,8 +36,7 @@
   ],
   "host_permissions": [
     "http://*/*",
-    "https://*/*",
-    "storage",
-    "notifications"],
+    "https://*/*"
+  ],
   "optional_permissions": []
 }
