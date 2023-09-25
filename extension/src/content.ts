@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { debounce } from './content-lib/debounce'
 import { getSanitizedUrl } from './lib/getSanitizedUrl'
 import { getDomainType } from './lib/getDomainType'
-import { DomainType, PasswordContent, ProtectedRoutes, UsernameContent } from './types'
+import { AlertTypes, DomainType, PasswordContent, ProtectedRoutes, UsernameContent } from './types'
 import { getConfig } from './config'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 import { getHostFromUrl } from "./lib/getHostFromUrl";
-import {checkDOMHash, saveDOMHash} from "./lib/domhash";
+import { checkDOMHash, saveDOMHash } from "./lib/domhash";
 import { handlePasswordEntry } from './lib/handlePassword'
 import {showCheckmarkIfEnterpriseDomain} from "./lib/showCheckmarkIfEnterpriseDomain";
+import { createServerAlert } from "./lib/sendAlert";
 
 // wait for page to load before doing anything
 function ready(callbackFunc: () => void) {
@@ -179,6 +179,16 @@ ready(async() => {
     document.addEventListener('input', inputChangedTrigger, true)
     void checkDomHash()
   }
+
+  chrome.runtime.onMessage.addListener(   (message, sender, sendResponse) => {
+    const { notificationUrl } = message
+    void createServerAlert({
+        referrer: '',
+        url: notificationUrl,
+        timestamp: new Date().getTime(),
+        alertType: AlertTypes.FALSEPOSITIVE,
+      })
+  });
 
 })
 

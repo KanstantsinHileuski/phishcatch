@@ -65,7 +65,7 @@ async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHa
         content: {
           opt,
           hashData,
-          url: message.url
+          messageUrl: message.url
         }
       })
   }

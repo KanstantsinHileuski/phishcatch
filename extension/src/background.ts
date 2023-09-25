@@ -17,10 +17,10 @@ const notificationStorage: any = []
 import { PageMessage } from './types'
 export function receiveMessage(message: PageMessage) {
   if(message.msgtype === 'notification') {
-    const { opt } = message.content
+    const { opt, messageUrl } = message.content
 
     chrome.notifications.create(opt, (id: string) => {
-      notificationStorage.push({id, opt})
+      notificationStorage.push({id, opt, messageUrl})
     })
 
     chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
@@ -42,13 +42,10 @@ export function receiveMessage(message: PageMessage) {
             console.log("notification is created")
           })
 
-          // void createServerAlert({
-          //   referrer: '',
-          //   url: notificationData.url,
-          //   timestamp: new Date().getTime(),
-          //   alertType: AlertTypes.FALSEPOSITIVE,
-          // })
-
+          chrome.tabs.query({active: true, lastFocusedWindow: true}, (tabs) => {
+            console.log(notificationData)
+            chrome.tabs.sendMessage(tabs[0].id!, {notificationUrl: notificationData.messageUrl});
+          });
         } else if (buttonIndex === 1) {
           const opt: chrome.notifications.NotificationOptions = {
             type: 'basic',
@@ -62,12 +59,9 @@ export function receiveMessage(message: PageMessage) {
             console.log("notification is created")
           })
 
-          // void createServerAlert({
-          //   referrer: '',
-          //   url: notificationData.url,
-          //   timestamp: new Date().getTime(),
-          //   alertType: AlertTypes.FALSEPOSITIVE,
-          // })
+          chrome.tabs.query({active: true, lastFocusedWindow: true}, (tabs) => {
+            chrome.tabs.sendMessage(tabs[0].id!, {notificationUrl: notificationData.messageUrl});
+          })
         }
 
         // void removeHash(notificationData.hash)
