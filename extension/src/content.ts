@@ -20,7 +20,6 @@ import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 import { getHostFromUrl } from "./lib/getHostFromUrl";
 import { checkDOMHash, saveDOMHash } from "./lib/domhash";
 import { handlePasswordEntry } from './lib/handlePassword'
-import {showCheckmarkIfEnterpriseDomain} from "./lib/showCheckmarkIfEnterpriseDomain";
 import { createServerAlert } from "./lib/sendAlert";
 
 // wait for page to load before doing anything
@@ -168,19 +167,19 @@ async function checkIfUrlBanned() {
 
 ready(async() => {
   const host = getHostFromUrl(window.location.href);
-  void showCheckmarkIfEnterpriseDomain()
 
-  console.log('content', await getDomainType(host), host);
   if (await getDomainType(host) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
     document.addEventListener('focusout', enterpriseFocusOutTrigger, true)
     document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
+    chrome.runtime.sendMessage({setBadgeText: true})
     void checkDomHash()
-  } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
+  } else if ((await getDomainType(host)) === DomainType.DANGEROUS || host !== ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
     document.addEventListener('input', inputChangedTrigger, true)
+    chrome.runtime.sendMessage({setBadgeText: false})
     void checkDomHash()
   }
 
-  chrome.runtime.onMessage.addListener(   (message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener(   (message) => {
     const { notificationUrl } = message
     void createServerAlert({
         referrer: '',
@@ -189,6 +188,7 @@ ready(async() => {
         alertType: AlertTypes.FALSEPOSITIVE,
       })
   });
+
 
 })
 

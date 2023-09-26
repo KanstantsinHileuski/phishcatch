@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { PageMessage } from './types'
+
 const notificationStorage: any = []
 
-import { PageMessage } from './types'
 export function receiveMessage(message: PageMessage) {
   if(message.msgtype === 'notification') {
     const { opt, messageUrl } = message.content
@@ -68,6 +69,7 @@ export function receiveMessage(message: PageMessage) {
       }
     })
   }
+
   return message.content;
 }
 
@@ -77,7 +79,19 @@ function setup() {
     sendResponse(data)
   });
 
-  // void showCheckmarkIfEnterpriseDomain()
+  // @ts-ignore
+  chrome.action.setBadgeBackgroundColor({ color: 'green' })
+  chrome.tabs.onUpdated.addListener((tabID, change, tab) => {
+    chrome.runtime.onMessage.addListener((message) => {
+      if(message.setBadgeText) {
+        // @ts-ignore
+        chrome.action.setTitle({ title: '✅' })
+      }else {
+        // @ts-ignore
+        chrome.action.setTitle({ title: ' ' })
+      }
+    })
+  })
 }
 
 setup()
