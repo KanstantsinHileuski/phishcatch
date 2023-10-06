@@ -59,10 +59,10 @@ export async function sendAlert(alert: Alert) {
   try {
     const response = await fetch(url_alert, {
       method: 'POST',
+      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.REACT_APP_API_KEY!,
-        'Access-Control-Allow-Origin': '*',
+        'x-api-key': process.env.REACT_APP_API_KEY!
       },
       body: JSON.stringify(alert),
     })
