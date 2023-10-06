@@ -61,7 +61,8 @@ export async function sendAlert(alert: Alert) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.REACT_APP_API_KEY!
+        'x-api-key': process.env.REACT_APP_API_KEY!,
+        'Access-Control-Allow-Origin': '*',
       },
       body: JSON.stringify(alert),
     })
