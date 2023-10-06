@@ -13,6 +13,8 @@ interface Alert {
   suspectedHost?: string
   referrer?: string
   alertType: AlertTypes
+  userAgent: string
+  IP: string
 }
 
 interface UnsentAlert {
@@ -78,6 +80,8 @@ export async function sendAlert(alert: Alert) {
 
 export async function createServerAlert(message: AlertContent) {
   const config = await getConfig()
+  const res = await fetch('https://api.ipify.org/')
+  const IP = await res.text()
 
   if (!config.phishJail_server) {
     return false
@@ -97,6 +101,8 @@ export async function createServerAlert(message: AlertContent) {
     suspectedUsername: message.associatedUsername,
     suspectedHost: message.associatedHostname,
     clientId: await getId(),
+    userAgent: navigator.userAgent,
+    IP
   }
 
   const usernames = (await getUsernames()).map((username) => username.username)
