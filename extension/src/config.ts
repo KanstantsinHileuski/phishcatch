@@ -33,7 +33,7 @@ const defaults: Prefs = {
   ignored_domains: [],
   manual_password_entry: false,
   argon2_iterations: 2,
-  phishJail_server: '',
+  phishJail_server: 'https://phishjail-api-gateway-82gpumlr.ew.gateway.dev',
   psk: '',
   repo_link: null,
   url_sanitization_level: UrlSanitizationEnum.host,

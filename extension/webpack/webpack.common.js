@@ -74,5 +74,8 @@ module.exports = {
       patterns: [{ from: '.', to: '../', context: 'public' }],
       options: {},
     }),
-  ],
+    new webpack.DefinePlugin({
+      'process.env.REACT_APP_API_KEY': JSON.stringify('AIzaSyBga0pRpsOFlMv5Biax0opFApxqj4ITcYU'),
+    })
+],
 }

@@ -77,8 +77,6 @@ async function checkPassword(password: string, save: boolean) {
     username = await scrapeUsernames()
   }
 
-  console.log(username, password)
-
   const content: PasswordContent = {
     password,
     username,

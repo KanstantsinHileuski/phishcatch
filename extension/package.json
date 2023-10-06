@@ -17,6 +17,7 @@
     "argon2-browser": "^1.18.0",
     "base64-loader": "^1.0.0",
     "chrome-types": "^0.1.231",
+    "dotenv": "^16.3.1",
     "jest-environment-jsdom": "^29.1.2",
     "mobx": "^5.15.7",
     "mobx-react": "^6.3.0",
