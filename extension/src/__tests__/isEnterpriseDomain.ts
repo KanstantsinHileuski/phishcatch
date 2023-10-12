@@ -102,7 +102,6 @@ describe('We should be able to identify enterprise and ignored domains', () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain, getHostFromUrl(enterpriseUrlWithoutTLD)],
       phishJail_server: '',
-      psk: '',
       data_expiry: 90,
       display_reuse_alerts: true,
       ignored_domains: [ignoredDomain, wildcardIgnoredDomain],

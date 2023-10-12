@@ -50,7 +50,6 @@ describe('Password hashing should work', () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
       phishJail_server: '',
-      psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
@@ -63,7 +62,6 @@ describe('Password hashing should work', () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
       phishJail_server: '',
-      psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
@@ -109,7 +107,6 @@ describe('Password hashing should work', () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
       phishJail_server: '',
-      psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
@@ -359,7 +356,6 @@ describe('Password message handling works as expected', () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
       phishJail_server: '',
-      psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
@@ -398,7 +394,6 @@ describe('Password hash truncation works', () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
       phishJail_server: '',
-      psk: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],

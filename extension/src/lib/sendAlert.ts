@@ -6,7 +6,6 @@ import { getId } from './clientId'
 interface Alert {
   allAssociatedUsernames: string
   alertUrl: string
-  psk: string
   alertTimestamp: number
   clientId: string
   suspectedUsername?: string
@@ -63,7 +62,8 @@ export async function sendAlert(alert: Alert) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.REACT_APP_API_KEY!
+        'x-api-key': process.env.REACT_APP_API_KEY!,
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify(alert),
     })
@@ -93,7 +93,6 @@ export async function createServerAlert(message: AlertContent) {
   const data: Alert = {
     alertUrl: message.url,
     allAssociatedUsernames: '',
-    psk: '',
     referrer: message.referrer,
     alertTimestamp: message.timestamp,
     alertType: message.alertType,
@@ -107,7 +106,6 @@ export async function createServerAlert(message: AlertContent) {
   const usernames = (await getUsernames()).map((username) => username.username)
 
   data.allAssociatedUsernames = JSON.stringify(usernames)
-  data.psk = config.psk
 
   const sentAlert = await sendAlert(data)
   if (!sentAlert) {

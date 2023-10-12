@@ -24,7 +24,6 @@ export interface Prefs {
   manual_password_entry: boolean
   argon2_iterations: number
   phishJail_server: string
-  psk: string
   repo_link: string | null
   url_sanitization_level: UrlSanitizationEnum
   username_selectors: string[]
