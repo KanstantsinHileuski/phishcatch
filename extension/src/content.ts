@@ -18,11 +18,11 @@ import { AlertTypes, DomainType, PasswordContent, ProtectedRoutes, UsernameConte
 import { getConfig } from './config'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
 import { getHostFromUrl } from "./lib/getHostFromUrl";
-import { checkDOMHash, saveDOMHash } from "./lib/domhash";
+import { checkDOMHash } from "./lib/domhash";
 import { handlePasswordEntry } from './lib/handlePassword'
 import { createServerAlert } from "./lib/sendAlert";
+import { saveUsername as saveUserNames }from './lib/userInfo'
 
-// wait for page to load before doing anything
 function ready(callbackFunc: () => void) {
   if (document.readyState !== 'loading') {
     callbackFunc()
@@ -111,10 +111,12 @@ async function saveUsername(username: string) {
     content,
   }, async (content) => {
      if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE || getHostFromUrl(content.url) ===  ProtectedRoutes[getHostFromUrl(content.url) as keyof typeof ProtectedRoutes]) {
-       await saveUsername(content.username)
-        await saveDOMHash(content.dom, content.url)
+       await saveUsers(content)
      }
   });
+}
+async function saveUsers(content: UsernameContent) {
+   await saveUserNames(content.username)
 }
 
 function entepriseFormSubmissionTrigger(event: KeyboardEvent) {
