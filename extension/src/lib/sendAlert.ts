@@ -1,17 +1,3 @@
-// Copyright 2021 Palantir Technologies
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 import { getConfig } from '../config'
 import { AlertContent, AlertTypes } from '../types'
 import { getUsernames } from './userInfo'
@@ -20,13 +6,14 @@ import { getId } from './clientId'
 interface Alert {
   allAssociatedUsernames: string
   alertUrl: string
-  psk: string
   alertTimestamp: number
   clientId: string
   suspectedUsername?: string
   suspectedHost?: string
   referrer?: string
   alertType: AlertTypes
+  userAgent: string
+  IP: string
 }
 
 interface UnsentAlert {
@@ -68,17 +55,18 @@ export async function saveUnsentAlert(newUnsentAlert: UnsentAlert) {
 
 export async function sendAlert(alert: Alert) {
   const config = await getConfig()
-  const url_alert = `${config.phishcatch_server}/alert`
+  const url_alert = `${config.phishJail_server}/alert`
 
   try {
     const response = await fetch(url_alert, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': process.env.REACT_APP_API_KEY!,
+        'Access-Control-Allow-Origin': '*'
       },
       body: JSON.stringify(alert),
     })
-
     if (response.status === 200) {
       return true
     } else {
@@ -91,8 +79,10 @@ export async function sendAlert(alert: Alert) {
 
 export async function createServerAlert(message: AlertContent) {
   const config = await getConfig()
+  const res = await fetch('https://api.ipify.org/')
+  const IP = await res.text()
 
-  if (!config.phishcatch_server) {
+  if (!config.phishJail_server) {
     return false
   }
 
@@ -103,19 +93,19 @@ export async function createServerAlert(message: AlertContent) {
   const data: Alert = {
     alertUrl: message.url,
     allAssociatedUsernames: '',
-    psk: '',
     referrer: message.referrer,
     alertTimestamp: message.timestamp,
     alertType: message.alertType,
     suspectedUsername: message.associatedUsername,
     suspectedHost: message.associatedHostname,
     clientId: await getId(),
+    userAgent: navigator.userAgent,
+    IP
   }
 
   const usernames = (await getUsernames()).map((username) => username.username)
 
   data.allAssociatedUsernames = JSON.stringify(usernames)
-  data.psk = config.psk
 
   const sentAlert = await sendAlert(data)
   if (!sentAlert) {

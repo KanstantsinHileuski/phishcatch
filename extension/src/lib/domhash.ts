@@ -48,8 +48,8 @@ export async function alertUser(host: string) {
     const alertIconUrl = chrome.runtime.getURL('icon.png')
     const opt = {
       type: 'basic',
-      title: 'PhishCatch Alert',
-      message: `PhishCatch has detected a likely phishing page at: ${host}\n`,
+      title: 'PhishJail Alert',
+      message: `PhishJail has detected a likely phishing page at: ${host}\n`,
       iconUrl: alertIconUrl,
     }
 

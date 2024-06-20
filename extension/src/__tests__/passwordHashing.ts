@@ -15,7 +15,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-floating-promises */
 import * as crypto from 'crypto'
-import { handlePasswordEntry } from '../background'
+import { handlePasswordEntry } from "../lib/handlePassword";
 import { hashPasswordWithSalt } from '../lib/generateHash'
 import { getPasswordHashes, checkStoredHashes, hashAndSavePassword, removeHash } from '../lib/userInfo'
 import { setConfigOverride } from '../config'
@@ -49,8 +49,7 @@ describe('Password hashing should work', () => {
   beforeAll(async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
-      psk: '',
+      phishJail_server: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
@@ -62,8 +61,7 @@ describe('Password hashing should work', () => {
   it('A password should always hash to the same value (given the salt is the same)', async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
-      psk: '',
+      phishJail_server: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
@@ -108,8 +106,7 @@ describe('Password hashing should work', () => {
   it('Changing the number of iterations should produce a different result', async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
-      psk: '',
+      phishJail_server: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
@@ -358,8 +355,7 @@ describe('Password message handling works as expected', () => {
   it('Setting expire_hash_on_use should prevent passwords from alerting twice', async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
-      psk: '',
+      phishJail_server: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],
@@ -397,8 +393,7 @@ describe('Password hash truncation works', () => {
   beforeAll(async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain],
-      phishcatch_server: '',
-      psk: '',
+      phishJail_server: '',
       data_expiry: 90,
       display_reuse_alerts: false,
       ignored_domains: [ignoredDomain],

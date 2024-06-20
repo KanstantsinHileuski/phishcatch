@@ -23,7 +23,7 @@
 			}
 		},
 		"faq_link": {
-			"description": "Link to a FAQ explaining what PhishCatch does",
+			"description": "Link to a FAQ explaining what PhishJail does",
 			"type": "string"
 		},
 		"ignored_domains": {
@@ -43,8 +43,8 @@
 			"type": "integer",
 			"default": 100000
 		},
-		"phishcatch_server": {
-			"description": "URL of the PhishCatch server",
+		"PhishJail_server": {
+			"description": "URL of the PhishJail server",
 			"type": "string"
 		},
 		"hash_truncation_amount": {
@@ -52,11 +52,11 @@
 			"type": "integer"
 		},
 		"psk": {
-			"description": "Preshared key as configured on the PhishCatch server",
+			"description": "Preshared key as configured on the PhishJail server",
 			"type": "string"
 		},
 		"repo_link": {
-			"description": "Link to the PhishCatch source code, for intrepid users",
+			"description": "Link to the PhishJail source code, for intrepid users",
 			"type": "string"
 		},
 		"url_sanitization_level": {
@@ -84,7 +84,7 @@
 			}
 		},
 		"banned_urls": {
-			"description": "Banned URLs. Phishcatch will prevent the user from interacting with these pages.",
+			"description": "Banned URLs. PhishJail will prevent the user from interacting with these pages.",
 			"type": "array",
 			"items": {
 				"type": "string"

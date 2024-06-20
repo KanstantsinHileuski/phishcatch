@@ -1,133 +1,83 @@
-// Copyright 2021 Palantir Technologies
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+import { PageMessage } from './types'
 
-import { getConfig } from './config'
-import {
-  PageMessage,
-  UsernameContent,
-  PasswordContent,
-  DomstringContent,
-  PasswordHandlingReturnValue,
-  DomainType,
-  AlertTypes,
-  PasswordHash,
-  ProtectedRoutes,
-} from './types'
-import { hashAndSavePassword as hashAndSavePassword, saveUsername, getHashDataIfItExists, removeHash } from './lib/userInfo'
-import { checkDOMHash, saveDOMHash } from './lib/domhash'
-import { showCheckmarkIfEnterpriseDomain } from './lib/showCheckmarkIfEnterpriseDomain'
-import { createServerAlert } from './lib/sendAlert'
-import { getDomainType } from './lib/getDomainType'
-import { getHostFromUrl } from './lib/getHostFromUrl'
-import { timedCleanup } from './lib/timedCleanup'
-import { addNotification, handleNotificationClick } from './lib/handleNotificationClick'
+const notificationStorage: any = []
 
-export async function receiveMessage(message: PageMessage): Promise<void> {
-  switch (message.msgtype) {
-    case 'debug': {
-      break
-    }
-    case 'username': {
-      const content = <UsernameContent>message.content
+export function receiveMessage(message: PageMessage) {
+  if(message.msgtype === 'notification') {
+    const { opt, messageUrl } = message.content
 
-      if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE || getHostFromUrl(content.url) ===  ProtectedRoutes[getHostFromUrl(content.url) as keyof typeof ProtectedRoutes]) {
-        void saveUsername(content.username)
-        void saveDOMHash(content.dom, content.url)
+    chrome.notifications.create(opt, (id: string) => {
+      notificationStorage.push({id, opt, messageUrl})
+    })
+
+    chrome.notifications.onButtonClicked.addListener((notificationId, buttonIndex) => {
+      const notificationData = notificationStorage.find((data: any) => data.id === notificationId);
+
+      if (notificationData) {
+        const alertIconUrl = chrome.runtime.getURL('icon.png')
+        if (buttonIndex === 0) {
+          const opt: chrome.notifications.NotificationOptions = {
+            type: 'basic',
+            title: 'PhishJail Alert',
+            message: `Reporting false positive and removing matched password`,
+            iconUrl: alertIconUrl,
+            priority: 2,
+            buttons: [{title: 'PhishJail Alert'}]
+          }
+
+          chrome.notifications.create(opt, () => {
+            console.log("notification is created")
+          })
+
+          chrome.tabs.query({active: true, lastFocusedWindow: true}, (tabs) => {
+            console.log(notificationData)
+            chrome.tabs.sendMessage(tabs[0].id!, {notificationUrl: notificationData.messageUrl});
+          });
+        } else if (buttonIndex === 1) {
+          const opt: chrome.notifications.NotificationOptions = {
+            type: 'basic',
+            title: 'PhishJail Alert',
+            message: `Removing matched password`,
+            iconUrl: alertIconUrl,
+            priority: 2,
+          }
+
+          chrome.notifications.create(opt, () => {
+            console.log("notification is created")
+          })
+
+          chrome.tabs.query({active: true, lastFocusedWindow: true}, (tabs) => {
+            chrome.tabs.sendMessage(tabs[0].id!, {notificationUrl: notificationData.messageUrl});
+          })
+        }
+
+        // void removeHash(notificationData.hash)
       }
-      break
-    }
-    case 'password': {
-      const content = <PasswordContent>message.content
-      if (content.password) {
-        void handlePasswordEntry(content)
-      }
-      break
-    }
-    case 'domstring': {
-      const content = <DomstringContent>message.content
-      void checkDOMHash(content.dom, content.url)
-      break
-    }
-  }
-}
-
-//check if the site the password was entered into is a corporate site
-export async function handlePasswordEntry(message: PasswordContent) {
-  const url = message.url
-  const host = getHostFromUrl(url)
-  const password = message.password
-  const protectedRoute = ProtectedRoutes[host as keyof typeof ProtectedRoutes]
-
-  if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === protectedRoute) {
-    if (message.save) {
-      await hashAndSavePassword(password, message.username, host)
-      return PasswordHandlingReturnValue.EnterpriseSave
-    }
-    return PasswordHandlingReturnValue.EnterpriseNoSave
-  } else if ((await getDomainType(host)) === DomainType.DANGEROUS || host !==  protectedRoute) {
-    const hashData = await getHashDataIfItExists(password)
-    if (hashData) {
-      await handlePasswordLeak(message, hashData)
-      return PasswordHandlingReturnValue.ReuseAlert
-    }
-  } else {
-    return PasswordHandlingReturnValue.IgnoredDomain
-  }
-
-  return PasswordHandlingReturnValue.NoReuse
-}
-
-async function handlePasswordLeak(message: PasswordContent, hashData: PasswordHash) {
-  const config = await getConfig()
-  const alertContent = {
-    ...message,
-    alertType: AlertTypes.REUSE,
-    associatedHostname: hashData.hostname || '',
-    associatedUsername: hashData.username || '',
-  }
-
-  void createServerAlert(alertContent)
-
-  if (config.display_reuse_alerts) {
-    const alertIconUrl = chrome.runtime.getURL('icon.png')
-    const opt: chrome.notifications.NotificationOptions = {
-      type: 'basic',
-      title: 'PhishCatch Alert',
-      message: `PhishCatch has detected enterprise password re-use on the url: ${message.url}\n`,
-      iconUrl: alertIconUrl,
-      requireInteraction: true,
-      priority: 2,
-      buttons: [{ title: 'This is a false positive' }, { title: `That wasn't my enterprise password` }],
-    }
-
-    chrome.notifications.create(opt, (id) => {
-      addNotification({ id, hash: hashData.hash, url: message.url })
     })
   }
 
-  if (config.expire_hash_on_use) {
-    await removeHash(hashData.hash)
-  }
+  return message.content;
 }
 
 function setup() {
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  chrome.runtime.onMessage.addListener(receiveMessage)
-  chrome.notifications.onButtonClicked.addListener(handleNotificationClick)
+  chrome.runtime.onMessage.addListener(   (message, sender, sendResponse) => {
+    let data = receiveMessage(message)
+    sendResponse(data)
+  });
 
-  void showCheckmarkIfEnterpriseDomain()
-  timedCleanup()
+  // @ts-ignore
+  chrome.action.setBadgeBackgroundColor({ color: 'green' })
+  chrome.tabs.onUpdated.addListener((tabID, change, tab) => {
+    chrome.runtime.onMessage.addListener((message) => {
+      if(message.setBadgeText) {
+        // @ts-ignore
+        chrome.action.setTitle({ title: '✅' })
+      }else {
+        // @ts-ignore
+        chrome.action.setTitle({ title: ' ' })
+      }
+    })
+  })
 }
 
 setup()

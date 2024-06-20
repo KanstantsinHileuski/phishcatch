@@ -17,10 +17,10 @@ import * as ReactDOM from 'react-dom'
 import { App } from './react-popup/app'
 
 function ready(callbackFunc: () => void) {
-  if (document.readyState !== 'loading') {
-    callbackFunc()
-  } else if (document.addEventListener) {
-    document.addEventListener('DOMContentLoaded', callbackFunc)
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', callbackFunc);
+  } else {
+    callbackFunc();
   }
 }
 

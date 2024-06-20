@@ -23,8 +23,7 @@ export interface Prefs {
   ignored_domains: string[]
   manual_password_entry: boolean
   argon2_iterations: number
-  phishcatch_server: string
-  psk: string
+  phishJail_server: string
   repo_link: string | null
   url_sanitization_level: UrlSanitizationEnum
   username_selectors: string[]
@@ -39,8 +38,9 @@ export enum UrlSanitizationEnum {
 }
 
 export interface PageMessage {
-  msgtype: 'username' | 'password' | 'debug' | 'domstring'
-  content: PasswordContent | UsernameContent | DomstringContent | string
+  msgtype: 'username' | 'password' | 'debug' | 'domstring' | 'notification' | 'setTitle'
+  content: PasswordContent | UsernameContent | DomstringContent | string | any
+  setBadgeText?: boolean
 }
 
 export interface PasswordContent {

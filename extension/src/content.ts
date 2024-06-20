@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { debounce } from './content-lib/debounce'
 import { getSanitizedUrl } from './lib/getSanitizedUrl'
 import { getDomainType } from './lib/getDomainType'
-import { DomainType, PasswordContent, ProtectedRoutes, UsernameContent } from './types'
+import { AlertTypes, DomainType, PasswordContent, ProtectedRoutes, UsernameContent } from './types'
 import { getConfig } from './config'
 import { isBannedUrl, setBannedMessage } from './content-lib/bannedMessage'
+import { getHostFromUrl } from "./lib/getHostFromUrl";
+import { checkDOMHash } from "./lib/domhash";
+import { handlePasswordEntry } from './lib/handlePassword'
+import { createServerAlert } from "./lib/sendAlert";
+import { saveUsername as saveUserNames }from './lib/userInfo'
 
-// wait for page to load before doing anything
 function ready(callbackFunc: () => void) {
   if (document.readyState !== 'loading') {
     callbackFunc()
@@ -81,10 +84,13 @@ async function checkPassword(password: string, save: boolean) {
     url: await getSanitizedUrl(location.href),
     referrer: await getSanitizedUrl(document.referrer),
     timestamp: new Date().getTime(),
-  }
+  };
+
   chrome.runtime.sendMessage({
     msgtype: 'password',
     content,
+  }, async (res) => {
+    await handlePasswordEntry(res)
   })
 }
 
@@ -98,11 +104,19 @@ async function saveUsername(username: string) {
     username,
     url: await getSanitizedUrl(location.href),
     dom: document.getElementsByTagName('body')[0].innerHTML,
-  }
+  };
+
   chrome.runtime.sendMessage({
     msgtype: 'username',
     content,
-  })
+  }, async (content) => {
+     if ((await getDomainType(getHostFromUrl(content.url))) === DomainType.ENTERPRISE || getHostFromUrl(content.url) ===  ProtectedRoutes[getHostFromUrl(content.url) as keyof typeof ProtectedRoutes]) {
+       await saveUsers(content)
+     }
+  });
+}
+async function saveUsers(content: UsernameContent) {
+   await saveUserNames(content.username)
 }
 
 function entepriseFormSubmissionTrigger(event: KeyboardEvent) {
@@ -122,13 +136,10 @@ function enterpriseFocusOutTrigger(event: FocusEvent) {
   }
 }
 
-// Debounce password checks to avoid hashing the password on every single input
-const debouncedCheckPassword = debounce(checkPassword, 100)
-
 function inputChangedTrigger(event: Event) {
   const target = event.target as HTMLInputElement
   if (target.nodeName === 'INPUT' && target.type === 'password') {
-    debouncedCheckPassword(target.value, true)
+    void checkPassword(target.value, true)
   }
 }
 
@@ -139,6 +150,12 @@ async function checkDomHash() {
       dom: document.getElementsByTagName('body')[0].innerHTML,
       url: await getSanitizedUrl(location.href),
     },
+  }, async (res) => {
+    if (document.addEventListener) {
+      document.addEventListener('DOMContentLoaded', async () => {
+        await checkDOMHash(res.dom, res.url)
+      })
+    }
   })
 }
 
@@ -148,19 +165,31 @@ async function checkIfUrlBanned() {
   }
 }
 
-ready(() => {
-  const host:string = window.location.hostname;
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  setTimeout(async () => {
-    if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
-      document.addEventListener('focusout', enterpriseFocusOutTrigger)
-      document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
-      void checkDomHash()
-    } else if ((await getDomainType(host)) === DomainType.DANGEROUS) {
-      document.addEventListener('input', inputChangedTrigger, false)
-      void checkDomHash()
-    }
-  }, 1500)
+ready(async() => {
+  const host = getHostFromUrl(window.location.href);
+
+  if (await getDomainType(host) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
+    document.addEventListener('focusout', enterpriseFocusOutTrigger, true)
+    document.addEventListener('keydown', entepriseFormSubmissionTrigger, true)
+    chrome.runtime.sendMessage({setBadgeText: true})
+    void checkDomHash()
+  } else if ((await getDomainType(host)) === DomainType.DANGEROUS || host !== ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
+    document.addEventListener('input', inputChangedTrigger, true)
+    chrome.runtime.sendMessage({setBadgeText: false})
+    void checkDomHash()
+  }
+
+  chrome.runtime.onMessage.addListener(   (message) => {
+    const { notificationUrl } = message
+    void createServerAlert({
+        referrer: '',
+        url: notificationUrl,
+        timestamp: new Date().getTime(),
+        alertType: AlertTypes.FALSEPOSITIVE,
+      })
+  });
+
+
 })
 
 checkIfUrlBanned()

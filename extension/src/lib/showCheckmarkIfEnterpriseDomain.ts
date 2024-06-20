@@ -21,16 +21,19 @@ async function updateBadge(tab: chrome.tabs.Tab) {
     const host = getHostFromUrl(tab.url)
 
     if ((await getDomainType(host)) === DomainType.ENTERPRISE || host === ProtectedRoutes[host as keyof typeof ProtectedRoutes]) {
-      chrome.browserAction.setBadgeText({ text: '✅' })
+      // @ts-ignore
+      chrome.action.setTitle({ text: '✅' })
     } else {
-      chrome.browserAction.setBadgeText({ text: '' })
+      // @ts-ignore
+      chrome.action.setTitle({ text: '' })
     }
   }
 }
 
-export function showCheckmarkIfEnterpriseDomain() {
+export async function showCheckmarkIfEnterpriseDomain() {
   try {
-    chrome.browserAction.setBadgeBackgroundColor({ color: 'green' })
+    // @ts-ignore
+    chrome.action.setBadgeBackgroundColor({ color: 'green' })
     chrome.tabs.onUpdated.addListener((tabID, change, tab) => {
       void updateBadge(tab)
     })

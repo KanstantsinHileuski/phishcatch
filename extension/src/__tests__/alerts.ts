@@ -53,8 +53,7 @@ const oldAlert = {
 beforeAll(async () => {
   await setConfigOverride({
     enterprise_domains: [],
-    phishcatch_server: `][][][][';';';';';==,.,+--.<><><`,
-    psk: '',
+    phishJail_server: `][][][][';';';';';==,.,+--.<><><`,
     data_expiry: 90,
     display_reuse_alerts: false,
     ignored_domains: [],

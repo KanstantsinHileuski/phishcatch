@@ -32,7 +32,7 @@ const evilSubDomain = 'foo.evil.com'
 beforeAll(async () => {
   await setConfigOverride({
     enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain, wildcardEnterpriseSubDomain],
-    phishcatch_server: '',
+    phishJail_server: '',
     psk: '',
     data_expiry: 90,
     display_reuse_alerts: true,
@@ -101,8 +101,7 @@ describe('We should be able to identify enterprise and ignored domains', () => {
   it('Domains without tlds should work correctly', async () => {
     await setConfigOverride({
       enterprise_domains: [enterpriseDomain, wildcardEnterpriseDomain, getHostFromUrl(enterpriseUrlWithoutTLD)],
-      phishcatch_server: '',
-      psk: '',
+      phishJail_server: '',
       data_expiry: 90,
       display_reuse_alerts: true,
       ignored_domains: [ignoredDomain, wildcardIgnoredDomain],

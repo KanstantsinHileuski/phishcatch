@@ -1,9 +1,9 @@
-# PhishCatch 
-See the wiki for documentation: https://github.com/palantir/phishcatch/wiki
+# PhishJail 
+See the wiki for documentation: https://github.com/palantir/PhishJail/wiki
 
-The PhishCatch extension is available in the Chrome Web Store: https://chrome.google.com/webstore/detail/phishcatch/jgegnlkclgfifjphjmijnkmicfgckmah
+The PhishJail extension is available in the Chrome Web Store: https://chrome.google.com/webstore/detail/PhishJail/jgegnlkclgfifjphjmijnkmicfgckmah
 
-Read our blog post about why we built PhishCatch and the problems it is designed to solve: https://blog.palantir.com/phishcatch-detecting-password-reuse-from-the-inside-out-77aa93e3e6fb
+Read our blog post about why we built PhishJail and the problems it is designed to solve: https://blog.palantir.com/PhishJail-detecting-password-reuse-from-the-inside-out-77aa93e3e6fb
 
 
 # Setting up and running locally 

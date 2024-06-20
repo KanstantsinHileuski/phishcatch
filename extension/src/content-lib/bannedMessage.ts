@@ -3,7 +3,7 @@ import { getConfig } from "../config"
 const bannedUrlMessage = `
 <div>
     <h2>
-        This URL has been blocked by Phishcatch.
+        This URL has been blocked by PhishJail.
     </h2>
     <p>
         This page has been determined to be likely to be abused by attackers.
